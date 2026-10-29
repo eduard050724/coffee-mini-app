@@ -5,14 +5,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Моя кофейня</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:#f7f3ed;color:#30251f;font-family:Arial,sans-serif}
 header{padding:28px 20px;background:#493328;color:white;border-radius:0 0 24px 24px}
 header small{color:#e8d2bd}
 h1{margin:8px 0;font-size:29px}
 main{padding:20px;max-width:650px;margin:auto}
 h2{font-size:20px}
+.panel{background:white;border-radius:16px;padding:18px;margin-bottom:16px}
+.panel p{line-height:1.5}
 .categories{display:flex;gap:8px;overflow:auto}
 .categories button{border:0;border-radius:20px;padding:11px 15px;background:#e8dfd3;white-space:nowrap;cursor:pointer}
 .categories button.active{background:#493328;color:white}
@@ -26,18 +30,21 @@ h2{font-size:20px}
 .cart-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0}
 .quantity button{border:0;border-radius:6px;padding:6px 11px;background:#e8dfd3;cursor:pointer}
 .checkout{width:100%;padding:14px;border:0;border-radius:12px;background:#bd8054;color:white;font-weight:bold;cursor:pointer}
-.checkout:disabled{opacity:.6;cursor:wait}
+button:disabled{opacity:.6;cursor:wait}
 .order-form{display:none;margin-top:16px;padding-top:12px;border-top:1px solid #eee}
 .order-form.visible{display:block}
-.order-form label{display:block;font-size:14px;margin:12px 0 5px}
-.order-form input,.order-form textarea{width:100%;padding:12px;border:1px solid #d8cbbd;border-radius:9px;font:inherit;background:white}
-.order-form textarea{min-height:75px;resize:vertical}
-.status{font-size:14px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}
+label{display:block;font-size:14px;margin:12px 0 5px}
+input,textarea{width:100%;padding:12px;border:1px solid #d8cbbd;border-radius:9px;font:inherit;background:white}
+textarea{min-height:75px;resize:vertical}
 .muted{color:#786b61;font-size:13px}
+.status{font-size:14px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}
+.error{color:#a32e22}
+.success{color:#276738}
 @media(max-width:360px){main{padding:14px}.products{gap:8px}.card{padding:9px}}
 </style>
 </head>
 <body>
+
 <header>
   <small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
   <h1>Кофе с собой ☕</h1>
@@ -45,55 +52,90 @@ h2{font-size:20px}
 </header>
 
 <main>
-  <h2>Меню</h2>
-  <div class="categories">
-    <button class="active" onclick="filter('Все',this)">Все</button>
-    <button onclick="filter('Кофе',this)">Кофе</button>
-    <button onclick="filter('Холодные напитки',this)">Холодные</button>
-    <button onclick="filter('Другое',this)">Другое</button>
-  </div>
+  <section class="panel" id="loadingPanel">
+    <h2>Подождите...</h2>
+    <p id="loadingText">Проверяем ваши данные.</p>
+  </section>
 
-  <div class="products" id="products"></div>
+  <section class="panel" id="registrationPanel" hidden>
+    <h2>Регистрация</h2>
+    <p class="muted">Заполни данные один раз. При следующих посещениях они будут загружаться автоматически.</p>
 
-  <div class="cart">
-    <h2>Корзина</h2>
-    <div id="cart">Пока пусто</div>
-    <p id="total">Итого: 0 ₽</p>
-    <button class="checkout" id="openCheckout" onclick="showCheckout()">
-      Оформить самовывоз
-    </button>
+    <form id="registrationForm">
+      <label for="regName">Как тебя зовут? *</label>
+      <input id="regName" maxlength="100" autocomplete="name"
+        required minlength="2" placeholder="Введите имя">
 
-    <form class="order-form" id="orderForm">
-      <h2>Данные для заказа</h2>
-      <p class="muted">Проверь заказ и оставь контактные данные.</p>
+      <label for="regPhone">Номер телефона для связи с бариста *</label>
+      <input id="regPhone" type="tel" maxlength="40"
+        autocomplete="tel" required minlength="5"
+        placeholder="+373...">
 
-      <label for="customerName">Имя *</label>
-      <input id="customerName" name="customerName" maxlength="100"
-        autocomplete="name" required placeholder="Как к тебе обращаться">
-
-      <label for="phone">Телефон *</label>
-      <input id="phone" name="phone" type="tel" maxlength="40"
-        autocomplete="tel" required placeholder="+373...">
-
-      <label for="comment">Комментарий к заказу</label>
-      <textarea id="comment" name="comment" maxlength="500"
-        placeholder="Например, без сахара"></textarea>
-
-      <p class="muted">Оплата на месте. Заказ — самовывоз.</p>
-      <button class="checkout" id="submitOrder" type="submit">
-        Подтвердить заказ
+      <p class="muted">Укажи номер, по которому бариста сможет связаться с тобой по заказу.</p>
+      <button class="checkout" id="registerButton" type="submit">
+        Сохранить данные
       </button>
-      <button type="button" class="checkout" onclick="hideCheckout()"
-        style="margin-top:8px;background:#e8dfd3;color:#30251f">
-        Назад в корзину
-      </button>
-      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <div class="status" id="registrationStatus" role="status" aria-live="polite"></div>
     </form>
-  </div>
+  </section>
+
+  <section class="panel" id="blockedPanel" hidden>
+    <h2>Не удалось открыть приложение</h2>
+    <p id="blockedText">Открой Mini App через Telegram-бота.</p>
+    <button class="checkout" onclick="checkProfile()">Проверить ещё раз</button>
+  </section>
+
+  <section id="shopPanel" hidden>
+    <div class="panel">
+      <h2>Ваш профиль</h2>
+      <div id="profileInfo"></div>
+      <p class="muted">Данные сохранены. Они будут использоваться для предзаказов.</p>
+    </div>
+
+    <h2>Меню</h2>
+    <div class="categories">
+      <button class="active" onclick="filter('Все',this)">Все</button>
+      <button onclick="filter('Кофе',this)">Кофе</button>
+      <button onclick="filter('Холодные напитки',this)">Холодные</button>
+      <button onclick="filter('Другое',this)">Другое</button>
+    </div>
+
+    <div class="products" id="products"></div>
+
+    <div class="cart">
+      <h2>Корзина</h2>
+      <div id="cart">Пока пусто</div>
+      <p id="total">Итого: 0 ₽</p>
+      <button class="checkout" id="openCheckout" onclick="showCheckout()">
+        Оформить самовывоз
+      </button>
+
+      <form class="order-form" id="orderForm">
+        <h2>Подтверждение заказа</h2>
+        <p id="orderCustomer"></p>
+        <p class="muted">Оплата на месте. Заказ — самовывоз.</p>
+
+        <label for="comment">Комментарий к заказу</label>
+        <textarea id="comment" maxlength="500"
+          placeholder="Например, без сахара"></textarea>
+
+        <button class="checkout" id="submitOrder" type="submit">
+          Подтвердить заказ
+        </button>
+        <button type="button" class="checkout" onclick="hideCheckout()"
+          style="margin-top:8px;background:#e8dfd3;color:#30251f">
+          Назад в корзину
+        </button>
+        <div class="status" id="orderStatus" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
 </main>
 
 <script>
 const API_URL = "https://coffee-orders-api.eduard-raikovski.workers.dev/";
+
+const tg = window.Telegram?.WebApp;
 
 const items = [
   {name:"Эспрессо",category:"Кофе",price:50,emoji:"☕"},
@@ -106,7 +148,159 @@ const items = [
 
 let basket = {};
 let current = "Все";
+let profile = null;
 let sending = false;
+let registering = false;
+
+if(tg){
+  tg.ready();
+  tg.expand();
+}
+
+function getInitData(){
+  return tg?.initData || "";
+}
+
+async function apiRequest(path,body){
+  const response = await fetch(API_URL + path,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+  });
+
+  let result;
+  try{
+    result = await response.json();
+  }catch{
+    throw new Error("Сервер вернул некорректный ответ.");
+  }
+
+  if(!response.ok){
+    throw new Error(result.error || "Ошибка сервера.");
+  }
+
+  return result;
+}
+
+function showPanel(id){
+  ["loadingPanel","registrationPanel","blockedPanel","shopPanel"]
+    .forEach(panelId=>{
+      document.getElementById(panelId).hidden = panelId !== id;
+    });
+}
+
+function showBlocked(message){
+  document.getElementById("blockedText").textContent = message;
+  showPanel("blockedPanel");
+}
+
+async function checkProfile(){
+  showPanel("loadingPanel");
+  document.getElementById("loadingText").textContent =
+    "Проверяем ваши данные.";
+
+  const initData = getInitData();
+
+  if(!initData){
+    showBlocked("Приложение нужно открыть через Telegram-бота, нажав кнопку открытия меню.");
+    return;
+  }
+
+  try{
+    const result = await apiRequest("api/profile",{initData});
+
+    if(result.registered && result.name && result.phone){
+      profile = {
+        name:result.name,
+        phone:result.phone
+      };
+      openShop();
+      return;
+    }
+
+    if(result.error){
+      showBlocked(result.error);
+      return;
+    }
+
+    profile = null;
+    document.getElementById("regName").value = result.name || "";
+    document.getElementById("regPhone").value = result.phone || "";
+    document.getElementById("registrationStatus").textContent = "";
+    showPanel("registrationPanel");
+  }catch(error){
+    showBlocked(
+      error.message ||
+      "Не удалось проверить профиль. Попробуй открыть приложение ещё раз."
+    );
+  }
+}
+
+document.getElementById("registrationForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(registering) return;
+
+  const initData = getInitData();
+  const name = document.getElementById("regName").value.trim();
+  const phone = document.getElementById("regPhone").value.trim();
+  const status = document.getElementById("registrationStatus");
+  const button = document.getElementById("registerButton");
+
+  if(!initData){
+    status.className = "status error";
+    status.textContent = "Открой приложение через Telegram-бота.";
+    return;
+  }
+
+  if(name.length < 2 || phone.length < 5){
+    status.className = "status error";
+    status.textContent = "Проверь имя и номер телефона.";
+    return;
+  }
+
+  registering = true;
+  button.disabled = true;
+  button.textContent = "Сохраняем...";
+  status.className = "status";
+  status.textContent = "Сохраняем данные.";
+
+  try{
+    const result = await apiRequest("api/register",{
+      initData,
+      name,
+      phone
+    });
+
+    profile = {
+      name:result.name || name,
+      phone:result.phone || phone
+    };
+
+    document.getElementById("registrationForm").reset();
+    openShop();
+  }catch(error){
+    status.className = "status error";
+    status.textContent = error.message ||
+      "Не удалось сохранить данные. Попробуй ещё раз.";
+  }finally{
+    registering = false;
+    button.disabled = false;
+    button.textContent = "Сохранить данные";
+  }
+});
+
+function openShop(){
+  document.getElementById("profileInfo").textContent =
+    profile.name + " · " + profile.phone;
+
+  document.getElementById("orderCustomer").textContent =
+    "Заказ оформляется на имя: " + profile.name +
+    ". Телефон: " + profile.phone;
+
+  showPanel("shopPanel");
+  renderProducts();
+  renderCart();
+}
 
 function filter(category,button){
   current = category;
@@ -150,7 +344,7 @@ function renderCart(){
 
   if(!names.length){
     cart.textContent = "Пока пусто";
-  } else {
+  }else{
     cart.innerHTML = names.map(name=>{
       const item = items.find(x=>x.name===name);
       return `<div class="cart-row">
@@ -169,9 +363,7 @@ function renderCart(){
   document.getElementById("total").textContent =
     "Итого: " + getTotal() + " ₽";
 
-  if(!names.length){
-    hideCheckout();
-  }
+  if(!names.length) hideCheckout();
 }
 
 function showCheckout(){
@@ -179,9 +371,14 @@ function showCheckout(){
     alert("Сначала добавь товары в корзину.");
     return;
   }
+
+  if(!profile){
+    alert("Не найден профиль. Перезапусти приложение.");
+    return;
+  }
+
   document.getElementById("orderForm").classList.add("visible");
-  document.getElementById("status").textContent = "";
-  document.getElementById("customerName").focus();
+  document.getElementById("orderStatus").textContent = "";
 }
 
 function hideCheckout(){
@@ -199,65 +396,51 @@ document.getElementById("orderForm").addEventListener("submit",async event=>{
     return;
   }
 
-  const customerName = document.getElementById("customerName").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const comment = document.getElementById("comment").value.trim();
-  const status = document.getElementById("status");
-  const submitButton = document.getElementById("submitOrder");
-
-  if(!customerName || !phone){
-    status.textContent = "Заполни имя и телефон.";
+  const initData = getInitData();
+  if(!initData){
+    showBlocked("Открой приложение через Telegram-бота.");
     return;
   }
 
-  const order = {
-    customerName,
-    phone,
-    comment,
-    items: names.map(name=>({
-      name,
-      quantity: basket[name]
-    }))
-  };
+  const comment = document.getElementById("comment").value.trim();
+  const status = document.getElementById("orderStatus");
+  const button = document.getElementById("submitOrder");
 
   sending = true;
-  submitButton.disabled = true;
-  submitButton.textContent = "Отправляем заказ...";
+  button.disabled = true;
+  button.textContent = "Отправляем заказ...";
+  status.className = "status";
   status.textContent = "Пожалуйста, подожди.";
 
   try{
-    const response = await fetch(API_URL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(order)
+    const result = await apiRequest("api/orders",{
+      initData,
+      items:names.map(name=>({
+        name,
+        quantity:basket[name]
+      })),
+      comment
     });
 
-    const result = await response.json();
-
-    if(!response.ok || !result.ok){
-      throw new Error(result.error || "Не удалось отправить заказ.");
-    }
-
     basket = {};
-    renderCart();
     document.getElementById("orderForm").reset();
     hideCheckout();
-    status.textContent = "";
+    renderCart();
+
     alert("Заказ отправлен! Дождись подтверждения кофейни.");
   }catch(error){
+    status.className = "status error";
     status.textContent =
-      "Не удалось отправить заказ. Проверь подключение и попробуй ещё раз. " +
-      "Товары остались в корзине.";
-    console.error("Order submission failed:",error);
+      error.message ||
+      "Не удалось отправить заказ. Товары остались в корзине.";
   }finally{
     sending = false;
-    submitButton.disabled = false;
-    submitButton.textContent = "Подтвердить заказ";
+    button.disabled = false;
+    button.textContent = "Подтвердить заказ";
   }
 });
 
-renderProducts();
-renderCart();
+checkProfile();
 </script>
 </body>
 </html>
