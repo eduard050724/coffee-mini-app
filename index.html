@@ -14,74 +14,250 @@ h1{margin:8px 0;font-size:29px}
 main{padding:20px;max-width:650px;margin:auto}
 h2{font-size:20px}
 .categories{display:flex;gap:8px;overflow:auto}
-.categories button{border:0;border-radius:20px;padding:11px 15px;background:#e8dfd3;white-space:nowrap}
+.categories button{border:0;border-radius:20px;padding:11px 15px;background:#e8dfd3;white-space:nowrap;cursor:pointer}
 .categories button.active{background:#493328;color:white}
 .products{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
 .card{background:white;border-radius:16px;padding:12px}
 .pic{font-size:48px;background:#f1e8dc;border-radius:12px;text-align:center;padding:15px}
 .card h3{margin:12px 0 5px;font-size:16px}
 .price{font-weight:bold}
-.add{width:100%;margin-top:10px;padding:11px;border:0;border-radius:10px;background:#493328;color:white}
+.add{width:100%;margin-top:10px;padding:11px;border:0;border-radius:10px;background:#493328;color:white;cursor:pointer}
 .cart{margin-top:22px;background:white;border-radius:16px;padding:16px}
-.checkout{width:100%;padding:14px;border:0;border-radius:12px;background:#bd8054;color:white;font-weight:bold}
+.cart-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0}
+.quantity button{border:0;border-radius:6px;padding:6px 11px;background:#e8dfd3;cursor:pointer}
+.checkout{width:100%;padding:14px;border:0;border-radius:12px;background:#bd8054;color:white;font-weight:bold;cursor:pointer}
+.checkout:disabled{opacity:.6;cursor:wait}
+.order-form{display:none;margin-top:16px;padding-top:12px;border-top:1px solid #eee}
+.order-form.visible{display:block}
+.order-form label{display:block;font-size:14px;margin:12px 0 5px}
+.order-form input,.order-form textarea{width:100%;padding:12px;border:1px solid #d8cbbd;border-radius:9px;font:inherit;background:white}
+.order-form textarea{min-height:75px;resize:vertical}
+.status{font-size:14px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}
+.muted{color:#786b61;font-size:13px}
+@media(max-width:360px){main{padding:14px}.products{gap:8px}.card{padding:9px}}
 </style>
 </head>
 <body>
 <header>
-<small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
-<h1>Кофе с собой ☕</h1>
-<div>Выбирай любимое — забирай свежим</div>
+  <small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
+  <h1>Кофе с собой ☕</h1>
+  <div>Выбирай любимое — забирай свежим</div>
 </header>
+
 <main>
-<h2>Меню</h2>
-<div class="categories">
-<button class="active" onclick="filter('Все',this)">Все</button>
-<button onclick="filter('Кофе',this)">Кофе</button>
-<button onclick="filter('Холодные напитки',this)">Холодные</button>
-<button onclick="filter('Другое',this)">Другое</button>
-</div>
-<div class="products" id="products"></div>
-<div class="cart">
-<h2>Корзина</h2>
-<div id="cart">Пока пусто</div>
-<p id="total">Итого: 0 ₽</p>
-<button class="checkout" onclick="checkout()">Оформить самовывоз</button>
-</div>
+  <h2>Меню</h2>
+  <div class="categories">
+    <button class="active" onclick="filter('Все',this)">Все</button>
+    <button onclick="filter('Кофе',this)">Кофе</button>
+    <button onclick="filter('Холодные напитки',this)">Холодные</button>
+    <button onclick="filter('Другое',this)">Другое</button>
+  </div>
+
+  <div class="products" id="products"></div>
+
+  <div class="cart">
+    <h2>Корзина</h2>
+    <div id="cart">Пока пусто</div>
+    <p id="total">Итого: 0 ₽</p>
+    <button class="checkout" id="openCheckout" onclick="showCheckout()">
+      Оформить самовывоз
+    </button>
+
+    <form class="order-form" id="orderForm">
+      <h2>Данные для заказа</h2>
+      <p class="muted">Проверь заказ и оставь контактные данные.</p>
+
+      <label for="customerName">Имя *</label>
+      <input id="customerName" name="customerName" maxlength="100"
+        autocomplete="name" required placeholder="Как к тебе обращаться">
+
+      <label for="phone">Телефон *</label>
+      <input id="phone" name="phone" type="tel" maxlength="40"
+        autocomplete="tel" required placeholder="+373...">
+
+      <label for="comment">Комментарий к заказу</label>
+      <textarea id="comment" name="comment" maxlength="500"
+        placeholder="Например, без сахара"></textarea>
+
+      <p class="muted">Оплата на месте. Заказ — самовывоз.</p>
+      <button class="checkout" id="submitOrder" type="submit">
+        Подтвердить заказ
+      </button>
+      <button type="button" class="checkout" onclick="hideCheckout()"
+        style="margin-top:8px;background:#e8dfd3;color:#30251f">
+        Назад в корзину
+      </button>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </form>
+  </div>
 </main>
+
 <script>
-const items=[
-{name:"Эспрессо",category:"Кофе",price:50,emoji:"☕"},
-{name:"Капучино",category:"Кофе",price:80,emoji:"🥛"},
-{name:"Латте",category:"Кофе",price:90,emoji:"☕"},
-{name:"Айс-кофе",category:"Холодные напитки",price:100,emoji:"🧋"},
-{name:"Чай",category:"Другое",price:50,emoji:"🍵"},
-{name:"Круассан",category:"Другое",price:65,emoji:"🥐"}
+const API_URL = "https://coffee-orders-api.eduard-raikovski.workers.dev/";
+
+const items = [
+  {name:"Эспрессо",category:"Кофе",price:50,emoji:"☕"},
+  {name:"Капучино",category:"Кофе",price:80,emoji:"🥛"},
+  {name:"Латте",category:"Кофе",price:90,emoji:"☕"},
+  {name:"Айс-кофе",category:"Холодные напитки",price:100,emoji:"🧋"},
+  {name:"Чай",category:"Другое",price:50,emoji:"🍵"},
+  {name:"Круассан",category:"Другое",price:65,emoji:"🥐"}
 ];
-let basket={};
-let current="Все";
+
+let basket = {};
+let current = "Все";
+let sending = false;
+
 function filter(category,button){
-current=category;
-document.querySelectorAll(".categories button").forEach(b=>b.classList.remove("active"));
-button.classList.add("active");
-renderProducts();
+  current = category;
+  document.querySelectorAll(".categories button")
+    .forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");
+  renderProducts();
 }
+
 function renderProducts(){
-document.getElementById("products").innerHTML=items.filter(x=>current==="Все"||x.category===current).map(x=>
-`<div class="card"><div class="pic">${x.emoji}</div><h3>${x.name}</h3><div class="price">${x.price} ₽</div><button class="add" onclick="add('${x.name}')">Добавить +</button></div>`
-).join("");
+  document.getElementById("products").innerHTML =
+    items.filter(x=>current==="Все"||x.category===current).map(x=>
+      `<div class="card">
+        <div class="pic">${x.emoji}</div>
+        <h3>${x.name}</h3>
+        <div class="price">${x.price} ₽</div>
+        <button class="add" onclick="add('${x.name}')">Добавить +</button>
+      </div>`
+    ).join("");
 }
-function add(name){basket[name]=(basket[name]||0)+1;renderCart()}
+
+function add(name){
+  basket[name] = (basket[name] || 0) + 1;
+  renderCart();
+}
+
+function changeQuantity(name,delta){
+  basket[name] = (basket[name] || 0) + delta;
+  if(basket[name] <= 0) delete basket[name];
+  renderCart();
+}
+
+function getTotal(){
+  return items.reduce((sum,item)=>
+    sum + item.price * (basket[item.name] || 0),0);
+}
+
 function renderCart(){
-let names=Object.keys(basket);
-document.getElementById("cart").innerHTML=names.length?names.map(n=>`${n} × ${basket[n]} <button onclick="basket['${n}']--;if(basket['${n}']<=0)delete basket['${n}'];renderCart()">−</button>`).join("<br>"):"Пока пусто";
-let sum=items.reduce((s,x)=>s+x.price*(basket[x.name]||0),0);
-document.getElementById("total").textContent="Итого: "+sum+" ₽";
+  const names = Object.keys(basket);
+  const cart = document.getElementById("cart");
+
+  if(!names.length){
+    cart.textContent = "Пока пусто";
+  } else {
+    cart.innerHTML = names.map(name=>{
+      const item = items.find(x=>x.name===name);
+      return `<div class="cart-row">
+        <span>${item.name} × ${basket[name]}<br>
+        <span class="muted">${item.price * basket[name]} ₽</span></span>
+        <span class="quantity">
+          <button type="button" aria-label="Уменьшить количество"
+            onclick="changeQuantity('${item.name}',-1)">−</button>
+          <button type="button" aria-label="Увеличить количество"
+            onclick="changeQuantity('${item.name}',1)">+</button>
+        </span>
+      </div>`;
+    }).join("");
+  }
+
+  document.getElementById("total").textContent =
+    "Итого: " + getTotal() + " ₽";
+
+  if(!names.length){
+    hideCheckout();
+  }
 }
-function checkout(){
-if(!Object.keys(basket).length){alert("Сначала добавь товары в корзину");return}
-alert("Демонстрация: следующим этапом подключим регистрацию и отправку заказа в Telegram.");
+
+function showCheckout(){
+  if(!Object.keys(basket).length){
+    alert("Сначала добавь товары в корзину.");
+    return;
+  }
+  document.getElementById("orderForm").classList.add("visible");
+  document.getElementById("status").textContent = "";
+  document.getElementById("customerName").focus();
 }
+
+function hideCheckout(){
+  document.getElementById("orderForm").classList.remove("visible");
+}
+
+document.getElementById("orderForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  if(sending) return;
+
+  const names = Object.keys(basket);
+  if(!names.length){
+    alert("Корзина пуста.");
+    return;
+  }
+
+  const customerName = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const comment = document.getElementById("comment").value.trim();
+  const status = document.getElementById("status");
+  const submitButton = document.getElementById("submitOrder");
+
+  if(!customerName || !phone){
+    status.textContent = "Заполни имя и телефон.";
+    return;
+  }
+
+  const order = {
+    customerName,
+    phone,
+    comment,
+    items: names.map(name=>({
+      name,
+      quantity: basket[name]
+    }))
+  };
+
+  sending = true;
+  submitButton.disabled = true;
+  submitButton.textContent = "Отправляем заказ...";
+  status.textContent = "Пожалуйста, подожди.";
+
+  try{
+    const response = await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(order)
+    });
+
+    const result = await response.json();
+
+    if(!response.ok || !result.ok){
+      throw new Error(result.error || "Не удалось отправить заказ.");
+    }
+
+    basket = {};
+    renderCart();
+    document.getElementById("orderForm").reset();
+    hideCheckout();
+    status.textContent = "";
+    alert("Заказ отправлен! Дождись подтверждения кофейни.");
+  }catch(error){
+    status.textContent =
+      "Не удалось отправить заказ. Проверь подключение и попробуй ещё раз. " +
+      "Товары остались в корзине.";
+    console.error("Order submission failed:",error);
+  }finally{
+    sending = false;
+    submitButton.disabled = false;
+    submitButton.textContent = "Подтвердить заказ";
+  }
+});
+
 renderProducts();
+renderCart();
 </script>
 </body>
 </html>
