@@ -6,52 +6,313 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Моя кофейня</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:#f7f3ed;color:#30251f;font-family:Arial,sans-serif}
-header{padding:28px 20px;background:#493328;color:white;border-radius:0 0 24px 24px}
+
+body{
+  margin:0;
+  background:#f7f3ed;
+  color:#30251f;
+  font-family:Arial,sans-serif
+}
+
+header{
+  padding:24px 20px;
+  background:#493328;
+  color:white;
+  border-radius:0 0 24px 24px;
+  position:relative
+}
+
 header small{color:#e8d2bd}
-h1{margin:8px 0;font-size:29px}
+h1{margin:8px 0;font-size:27px}
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px
+}
+
+.profile-button{
+  border:1px solid #a88b78;
+  background:#654b3e;
+  color:white;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:13px;
+  cursor:pointer;
+  white-space:nowrap
+}
+
 main{padding:20px;max-width:650px;margin:auto}
 h2{font-size:20px}
-.panel{background:white;border-radius:16px;padding:18px;margin-bottom:16px}
+
+.panel{
+  background:white;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px
+}
+
 .panel p{line-height:1.5}
-.categories{display:flex;gap:8px;overflow:auto}
-.categories button{border:0;border-radius:20px;padding:11px 15px;background:#e8dfd3;white-space:nowrap;cursor:pointer}
-.categories button.active{background:#493328;color:white}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.card{background:white;border-radius:16px;padding:12px}
-.pic{font-size:48px;background:#f1e8dc;border-radius:12px;text-align:center;padding:15px}
+
+.categories{
+  display:flex;
+  gap:8px;
+  overflow:auto
+}
+
+.categories button{
+  border:0;
+  border-radius:20px;
+  padding:11px 15px;
+  background:#e8dfd3;
+  white-space:nowrap;
+  cursor:pointer
+}
+
+.categories button.active{
+  background:#493328;
+  color:white
+}
+
+.products{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:12px
+}
+
+.pic{
+  font-size:48px;
+  background:#f1e8dc;
+  border-radius:12px;
+  text-align:center;
+  padding:15px
+}
+
 .card h3{margin:12px 0 5px;font-size:16px}
 .price{font-weight:bold}
-.add{width:100%;margin-top:10px;padding:11px;border:0;border-radius:10px;background:#493328;color:white;cursor:pointer}
-.cart{margin-top:22px;background:white;border-radius:16px;padding:16px}
-.cart-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:10px 0}
-.quantity button{border:0;border-radius:6px;padding:6px 11px;background:#e8dfd3;cursor:pointer}
-.checkout{width:100%;padding:14px;border:0;border-radius:12px;background:#bd8054;color:white;font-weight:bold;cursor:pointer}
+
+.add{
+  width:100%;
+  margin-top:10px;
+  padding:11px;
+  border:0;
+  border-radius:10px;
+  background:#493328;
+  color:white;
+  cursor:pointer
+}
+
+.cart{
+  margin-top:22px;
+  background:white;
+  border-radius:16px;
+  padding:16px
+}
+
+.cart-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:10px 0
+}
+
+.quantity button{
+  border:0;
+  border-radius:6px;
+  padding:6px 11px;
+  background:#e8dfd3;
+  cursor:pointer
+}
+
+.checkout{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  background:#bd8054;
+  color:white;
+  font-weight:bold;
+  cursor:pointer
+}
+
 button:disabled{opacity:.6;cursor:wait}
-.order-form{display:none;margin-top:16px;padding-top:12px;border-top:1px solid #eee}
-.order-form.visible{display:block}
-label{display:block;font-size:14px;margin:12px 0 5px}
-input,textarea{width:100%;padding:12px;border:1px solid #d8cbbd;border-radius:9px;font:inherit;background:white}
+
+label{
+  display:block;
+  font-size:14px;
+  margin:12px 0 5px
+}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #d8cbbd;
+  border-radius:9px;
+  font:inherit;
+  background:white
+}
+
 textarea{min-height:75px;resize:vertical}
 .muted{color:#786b61;font-size:13px}
-.status{font-size:14px;line-height:1.5;margin-top:12px;overflow-wrap:anywhere}
+.status{
+  font-size:14px;
+  line-height:1.5;
+  margin-top:12px;
+  overflow-wrap:anywhere
+}
 .error{color:#a32e22}
 .success{color:#276738}
-@media(max-width:360px){main{padding:14px}.products{gap:8px}.card{padding:9px}}
+
+/* Отдельные окна */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(25,17,13,.62);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  overflow-y:auto
+}
+
+.modal-content{
+  width:100%;
+  max-width:480px;
+  max-height:90vh;
+  overflow-y:auto;
+  background:#f7f3ed;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 12px 40px rgba(0,0,0,.2);
+  animation:modalAppear .18s ease-out
+}
+
+@keyframes modalAppear{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px
+}
+
+.modal-header h2{margin:0}
+
+.close-button{
+  border:0;
+  background:#e8dfd3;
+  color:#493328;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  font-size:22px;
+  cursor:pointer;
+  flex-shrink:0
+}
+
+.modal-info{
+  background:white;
+  border-radius:14px;
+  padding:14px;
+  margin:14px 0
+}
+
+.modal-info p{margin:7px 0;line-height:1.5}
+
+.modal-actions{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  margin-top:18px
+}
+
+.secondary-button{
+  width:100%;
+  padding:13px;
+  border:0;
+  border-radius:12px;
+  background:#e8dfd3;
+  color:#30251f;
+  font-weight:bold;
+  cursor:pointer
+}
+
+.order-summary-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin:10px 0;
+  font-size:14px
+}
+
+.order-total{
+  border-top:1px solid #e8dfd3;
+  padding-top:13px;
+  margin-top:13px;
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  font-size:18px
+}
+
+.success-icon{
+  font-size:58px;
+  text-align:center;
+  margin:12px 0
+}
+
+.success-title{
+  text-align:center;
+  font-size:23px;
+  margin:10px 0
+}
+
+@media(max-width:360px){
+  main{padding:14px}
+  .products{gap:8px}
+  .card{padding:9px}
+  header{padding:22px 15px}
+  .profile-button{padding:9px;font-size:12px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
-  <small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
-  <h1>Кофе с собой ☕</h1>
+  <div class="header-top">
+    <div>
+      <small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
+      <h1>Кофе с собой ☕</h1>
+    </div>
+
+    <button class="profile-button" onclick="openProfile()">
+      👤 Профиль
+    </button>
+  </div>
+
   <div>Выбирай любимое — забирай свежим</div>
 </header>
 
 <main>
+
   <section class="panel" id="loadingPanel">
     <h2>Подождите...</h2>
     <p id="loadingText">Проверяем ваши данные.</p>
@@ -59,7 +320,9 @@ textarea{min-height:75px;resize:vertical}
 
   <section class="panel" id="registrationPanel" hidden>
     <h2>Регистрация</h2>
-    <p class="muted">Заполни данные один раз. При следующих посещениях они будут загружаться автоматически.</p>
+    <p class="muted">
+      Заполни данные один раз. При следующих посещениях они будут загружаться автоматически.
+    </p>
 
     <form id="registrationForm">
       <label for="regName">Как тебя зовут? *</label>
@@ -71,28 +334,31 @@ textarea{min-height:75px;resize:vertical}
         autocomplete="tel" required minlength="5"
         placeholder="+373...">
 
-      <p class="muted">Укажи номер, по которому бариста сможет связаться с тобой по заказу.</p>
+      <p class="muted">
+        Укажи номер, по которому бариста сможет связаться с тобой по заказу.
+      </p>
+
       <button class="checkout" id="registerButton" type="submit">
         Сохранить данные
       </button>
-      <div class="status" id="registrationStatus" role="status" aria-live="polite"></div>
+
+      <div class="status" id="registrationStatus"
+        role="status" aria-live="polite"></div>
     </form>
   </section>
 
   <section class="panel" id="blockedPanel" hidden>
     <h2>Не удалось открыть приложение</h2>
     <p id="blockedText">Открой Mini App через Telegram-бота.</p>
-    <button class="checkout" onclick="checkProfile()">Проверить ещё раз</button>
+    <button class="checkout" onclick="checkProfile()">
+      Проверить ещё раз
+    </button>
   </section>
 
   <section id="shopPanel" hidden>
-    <div class="panel">
-      <h2>Ваш профиль</h2>
-      <div id="profileInfo"></div>
-      <p class="muted">Данные сохранены. Они будут использоваться для предзаказов.</p>
-    </div>
 
     <h2>Меню</h2>
+
     <div class="categories">
       <button class="active" onclick="filter('Все',this)">Все</button>
       <button onclick="filter('Кофе',this)">Кофе</button>
@@ -104,33 +370,141 @@ textarea{min-height:75px;resize:vertical}
 
     <div class="cart">
       <h2>Корзина</h2>
+
       <div id="cart">Пока пусто</div>
+
       <p id="total">Итого: 0 ₽</p>
-      <button class="checkout" id="openCheckout" onclick="showCheckout()">
+
+      <button class="checkout" id="openCheckout"
+        onclick="showCheckout()">
         Оформить самовывоз
       </button>
+    </div>
 
-      <form class="order-form" id="orderForm">
-        <h2>Подтверждение заказа</h2>
-        <p id="orderCustomer"></p>
-        <p class="muted">Оплата на месте. Заказ — самовывоз.</p>
+  </section>
 
-        <label for="comment">Комментарий к заказу</label>
-        <textarea id="comment" maxlength="500"
-          placeholder="Например, без сахара"></textarea>
+</main>
 
+<!-- Окно профиля -->
+<div class="modal" id="profileModal" hidden>
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <h2>👤 Мой профиль</h2>
+      <button class="close-button" onclick="closeProfile()">×</button>
+    </div>
+
+    <p class="muted">
+      Здесь можно посмотреть или изменить данные, которые используются при оформлении предзаказа.
+    </p>
+
+    <form id="profileForm">
+
+      <label for="profileName">Ваше имя</label>
+      <input id="profileName" maxlength="100"
+        required minlength="2" autocomplete="name">
+
+      <label for="profilePhone">Номер телефона</label>
+      <input id="profilePhone" type="tel" maxlength="40"
+        required minlength="5" autocomplete="tel">
+
+      <div class="modal-actions">
+        <button class="checkout" id="saveProfileButton" type="submit">
+          Сохранить изменения
+        </button>
+
+        <button class="secondary-button" type="button"
+          onclick="closeProfile()">
+          Закрыть
+        </button>
+      </div>
+
+      <div class="status" id="profileStatus"
+        role="status" aria-live="polite"></div>
+
+    </form>
+  </div>
+</div>
+
+<!-- Окно подтверждения заказа -->
+<div class="modal" id="checkoutModal" hidden>
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <h2>☕ Ваш предзаказ</h2>
+      <button class="close-button" onclick="hideCheckout()">×</button>
+    </div>
+
+    <p class="muted">
+      Проверь состав заказа перед отправкой бариста.
+    </p>
+
+    <div class="modal-info">
+      <p><b>Имя:</b> <span id="checkoutCustomer"></span></p>
+      <p><b>Телефон:</b> <span id="checkoutPhone"></span></p>
+    </div>
+
+    <div class="modal-info">
+      <h3 style="margin-top:0">Состав заказа</h3>
+      <div id="checkoutItems"></div>
+      <div class="order-total">
+        <span>Итого:</span>
+        <span id="checkoutTotal">0 ₽</span>
+      </div>
+    </div>
+
+    <form id="orderForm">
+
+      <label for="comment">Комментарий к заказу</label>
+      <textarea id="comment" maxlength="500"
+        placeholder="Например, без сахара"></textarea>
+
+      <p class="muted">
+        Оплата на месте. Заказ — самовывоз.
+      </p>
+
+      <div class="modal-actions">
         <button class="checkout" id="submitOrder" type="submit">
           Подтвердить заказ
         </button>
-        <button type="button" class="checkout" onclick="hideCheckout()"
-          style="margin-top:8px;background:#e8dfd3;color:#30251f">
-          Назад в корзину
+
+        <button type="button" class="secondary-button"
+          onclick="hideCheckout()">
+          Вернуться в меню
         </button>
-        <div class="status" id="orderStatus" role="status" aria-live="polite"></div>
-      </form>
+      </div>
+
+      <div class="status" id="orderStatus"
+        role="status" aria-live="polite"></div>
+
+    </form>
+  </div>
+</div>
+
+<!-- Окно успешного заказа -->
+<div class="modal" id="successModal" hidden>
+  <div class="modal-content">
+
+    <div class="success-icon">✅</div>
+
+    <h2 class="success-title">Предзаказ отправлен!</h2>
+
+    <p style="text-align:center;line-height:1.6">
+      Ваш заказ успешно отправлен бариста.
+      Дождитесь сообщения в Telegram о принятии заказа.
+    </p>
+
+    <div class="modal-info">
+      <p><b>Заказ:</b> принят к отправке в кофейню.</p>
+      <p><b>Самовывоз:</b> оплата на месте.</p>
     </div>
-  </section>
-</main>
+
+    <button class="checkout" onclick="closeSuccess()">
+      Вернуться в меню
+    </button>
+
+  </div>
+</div>
 
 <script>
 const API_URL = "https://coffee-orders-api.eduard-raikovski.workers.dev/";
@@ -151,6 +525,7 @@ let current = "Все";
 let profile = null;
 let sending = false;
 let registering = false;
+let savingProfile = false;
 
 if(tg){
   tg.ready();
@@ -169,6 +544,7 @@ async function apiRequest(path,body){
   });
 
   let result;
+
   try{
     result = await response.json();
   }catch{
@@ -196,13 +572,16 @@ function showBlocked(message){
 
 async function checkProfile(){
   showPanel("loadingPanel");
+
   document.getElementById("loadingText").textContent =
     "Проверяем ваши данные.";
 
   const initData = getInitData();
 
   if(!initData){
-    showBlocked("Приложение нужно открыть через Telegram-бота, нажав кнопку открытия меню.");
+    showBlocked(
+      "Приложение нужно открыть через Telegram-бота, нажав кнопку открытия меню."
+    );
     return;
   }
 
@@ -214,6 +593,7 @@ async function checkProfile(){
         name:result.name,
         phone:result.phone
       };
+
       openShop();
       return;
     }
@@ -224,10 +604,13 @@ async function checkProfile(){
     }
 
     profile = null;
+
     document.getElementById("regName").value = result.name || "";
     document.getElementById("regPhone").value = result.phone || "";
     document.getElementById("registrationStatus").textContent = "";
+
     showPanel("registrationPanel");
+
   }catch(error){
     showBlocked(
       error.message ||
@@ -236,13 +619,17 @@ async function checkProfile(){
   }
 }
 
-document.getElementById("registrationForm").addEventListener("submit",async event=>{
+// Первичная регистрация
+document.getElementById("registrationForm")
+.addEventListener("submit",async event=>{
   event.preventDefault();
+
   if(registering) return;
 
   const initData = getInitData();
   const name = document.getElementById("regName").value.trim();
   const phone = document.getElementById("regPhone").value.trim();
+
   const status = document.getElementById("registrationStatus");
   const button = document.getElementById("registerButton");
 
@@ -277,11 +664,14 @@ document.getElementById("registrationForm").addEventListener("submit",async even
     };
 
     document.getElementById("registrationForm").reset();
+
     openShop();
+
   }catch(error){
     status.className = "status error";
     status.textContent = error.message ||
       "Не удалось сохранить данные. Попробуй ещё раз.";
+
   }finally{
     registering = false;
     button.disabled = false;
@@ -290,38 +680,109 @@ document.getElementById("registrationForm").addEventListener("submit",async even
 });
 
 function openShop(){
-  document.getElementById("profileInfo").textContent =
-    profile.name + " · " + profile.phone;
-
-  document.getElementById("orderCustomer").textContent =
-    "Заказ оформляется на имя: " + profile.name +
-    ". Телефон: " + profile.phone;
-
   showPanel("shopPanel");
   renderProducts();
   renderCart();
 }
 
+// Открытие профиля
+function openProfile(){
+  if(!profile) return;
+
+  document.getElementById("profileName").value = profile.name;
+  document.getElementById("profilePhone").value = profile.phone;
+  document.getElementById("profileStatus").textContent = "";
+
+  document.getElementById("profileModal").hidden = false;
+}
+
+function closeProfile(){
+  if(savingProfile) return;
+
+  document.getElementById("profileModal").hidden = true;
+}
+
+// Сохранение изменений профиля
+document.getElementById("profileForm")
+.addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  if(savingProfile) return;
+
+  const name = document.getElementById("profileName").value.trim();
+  const phone = document.getElementById("profilePhone").value.trim();
+  const status = document.getElementById("profileStatus");
+  const button = document.getElementById("saveProfileButton");
+
+  if(name.length < 2 || phone.length < 5){
+    status.className = "status error";
+    status.textContent = "Проверь имя и номер телефона.";
+    return;
+  }
+
+  savingProfile = true;
+  button.disabled = true;
+  button.textContent = "Сохраняем...";
+  status.className = "status";
+  status.textContent = "Обновляем профиль.";
+
+  try{
+    const result = await apiRequest("api/register",{
+      initData:getInitData(),
+      name,
+      phone
+    });
+
+    profile = {
+      name:result.name || name,
+      phone:result.phone || phone
+    };
+
+    status.className = "status success";
+    status.textContent = "Данные успешно обновлены.";
+
+  }catch(error){
+    status.className = "status error";
+    status.textContent = error.message ||
+      "Не удалось обновить профиль.";
+
+  }finally{
+    savingProfile = false;
+    button.disabled = false;
+    button.textContent = "Сохранить изменения";
+  }
+});
+
+// Категории меню
 function filter(category,button){
   current = category;
+
   document.querySelectorAll(".categories button")
     .forEach(b=>b.classList.remove("active"));
+
   button.classList.add("active");
+
   renderProducts();
 }
 
+// Товары
 function renderProducts(){
   document.getElementById("products").innerHTML =
-    items.filter(x=>current==="Все"||x.category===current).map(x=>
-      `<div class="card">
-        <div class="pic">${x.emoji}</div>
-        <h3>${x.name}</h3>
-        <div class="price">${x.price} ₽</div>
-        <button class="add" onclick="add('${x.name}')">Добавить +</button>
-      </div>`
-    ).join("");
+    items
+      .filter(x=>current==="Все"||x.category===current)
+      .map(x=>
+        `<div class="card">
+          <div class="pic">${x.emoji}</div>
+          <h3>${x.name}</h3>
+          <div class="price">${x.price} ₽</div>
+          <button class="add" onclick="add('${x.name}')">
+            Добавить +
+          </button>
+        </div>`
+      ).join("");
 }
 
+// Корзина
 function add(name){
   basket[name] = (basket[name] || 0) + 1;
   renderCart();
@@ -329,7 +790,11 @@ function add(name){
 
 function changeQuantity(name,delta){
   basket[name] = (basket[name] || 0) + delta;
-  if(basket[name] <= 0) delete basket[name];
+
+  if(basket[name] <= 0){
+    delete basket[name];
+  }
+
   renderCart();
 }
 
@@ -347,13 +812,22 @@ function renderCart(){
   }else{
     cart.innerHTML = names.map(name=>{
       const item = items.find(x=>x.name===name);
+
       return `<div class="cart-row">
-        <span>${item.name} × ${basket[name]}<br>
-        <span class="muted">${item.price * basket[name]} ₽</span></span>
+        <span>
+          ${item.name} × ${basket[name]}<br>
+          <span class="muted">
+            ${item.price * basket[name]} ₽
+          </span>
+        </span>
+
         <span class="quantity">
-          <button type="button" aria-label="Уменьшить количество"
+          <button type="button"
+            aria-label="Уменьшить количество"
             onclick="changeQuantity('${item.name}',-1)">−</button>
-          <button type="button" aria-label="Увеличить количество"
+
+          <button type="button"
+            aria-label="Увеличить количество"
             onclick="changeQuantity('${item.name}',1)">+</button>
         </span>
       </div>`;
@@ -363,9 +837,12 @@ function renderCart(){
   document.getElementById("total").textContent =
     "Итого: " + getTotal() + " ₽";
 
-  if(!names.length) hideCheckout();
+  if(!names.length){
+    hideCheckout();
+  }
 }
 
+// Открытие отдельного окна оформления
 function showCheckout(){
   if(!Object.keys(basket).length){
     alert("Сначала добавь товары в корзину.");
@@ -377,27 +854,56 @@ function showCheckout(){
     return;
   }
 
-  document.getElementById("orderForm").classList.add("visible");
+  document.getElementById("checkoutCustomer").textContent =
+    profile.name;
+
+  document.getElementById("checkoutPhone").textContent =
+    profile.phone;
+
+  const names = Object.keys(basket);
+
+  document.getElementById("checkoutItems").innerHTML =
+    names.map(name=>{
+      const item = items.find(x=>x.name===name);
+
+      return `<div class="order-summary-row">
+        <span>${item.name} × ${basket[name]}</span>
+        <b>${item.price * basket[name]} ₽</b>
+      </div>`;
+    }).join("");
+
+  document.getElementById("checkoutTotal").textContent =
+    getTotal() + " ₽";
+
   document.getElementById("orderStatus").textContent = "";
+
+  document.getElementById("checkoutModal").hidden = false;
 }
 
 function hideCheckout(){
-  document.getElementById("orderForm").classList.remove("visible");
+  if(sending) return;
+
+  document.getElementById("checkoutModal").hidden = true;
 }
 
-document.getElementById("orderForm").addEventListener("submit",async event=>{
+// Отправка заказа
+document.getElementById("orderForm")
+.addEventListener("submit",async event=>{
   event.preventDefault();
 
   if(sending) return;
 
   const names = Object.keys(basket);
+
   if(!names.length){
     alert("Корзина пуста.");
     return;
   }
 
   const initData = getInitData();
+
   if(!initData){
+    hideCheckout();
     showBlocked("Открой приложение через Telegram-бота.");
     return;
   }
@@ -409,11 +915,12 @@ document.getElementById("orderForm").addEventListener("submit",async event=>{
   sending = true;
   button.disabled = true;
   button.textContent = "Отправляем заказ...";
+
   status.className = "status";
-  status.textContent = "Пожалуйста, подожди.";
+  status.textContent = "Пожалуйста, подожди. Отправляем заказ бариста.";
 
   try{
-    const result = await apiRequest("api/orders",{
+    await apiRequest("api/orders",{
       initData,
       items:names.map(name=>({
         name,
@@ -423,16 +930,22 @@ document.getElementById("orderForm").addEventListener("submit",async event=>{
     });
 
     basket = {};
+
     document.getElementById("orderForm").reset();
-    hideCheckout();
+
+    document.getElementById("checkoutModal").hidden = true;
+
     renderCart();
 
-    alert("Заказ отправлен! Дождись подтверждения кофейни.");
+    document.getElementById("successModal").hidden = false;
+
   }catch(error){
     status.className = "status error";
+
     status.textContent =
       error.message ||
       "Не удалось отправить заказ. Товары остались в корзине.";
+
   }finally{
     sending = false;
     button.disabled = false;
@@ -440,7 +953,26 @@ document.getElementById("orderForm").addEventListener("submit",async event=>{
   }
 });
 
+// Закрытие окна успешного заказа
+function closeSuccess(){
+  document.getElementById("successModal").hidden = true;
+}
+
+// Закрытие окон по клавише Escape
+document.addEventListener("keydown",event=>{
+  if(event.key === "Escape"){
+    if(!document.getElementById("successModal").hidden){
+      closeSuccess();
+    }else if(!document.getElementById("checkoutModal").hidden){
+      hideCheckout();
+    }else if(!document.getElementById("profileModal").hidden){
+      closeProfile();
+    }
+  }
+});
+
 checkProfile();
 </script>
+
 </body>
 </html>
