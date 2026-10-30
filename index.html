@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -249,7 +248,7 @@ if(tg){tg.ready();tg.expand()}
 
 const initData = tg?.initData || "";
 let categories=[],products=[],selectedCategory="all",cart=[];
-let currentProduct=null,currentAdminTab="products",adminData=null;
+let currentProduct=null,currentAdminTab="products",adminData=null,editingProductId=null;
 let profile={name:"",phone:""},registered=false;
 
 const $=id=>document.getElementById(id);
@@ -387,11 +386,11 @@ function renderProducts(){
     return;
   }
   visible.forEach(product=>{
-    const card=document.createElement("article");
+    const card=document.createElement("div");
     card.className="product";
     const image=product.image_url
-      ?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" onerror="this.parentElement.innerHTML='<span class=no-image>☕</span>'">`
-      :'<span class="no-image">☕</span>';
+      ?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}">`
+      :'<div class="no-image">☕</div>';
     card.innerHTML=`
       <div class="product-image">${image}</div>
       <div class="product-info">
@@ -696,9 +695,50 @@ function adminItem(title,subtitle,action,id,active=true){
   return `<div class="admin-item">
     <b>${escapeText(title)}</b><br><small>${escapeText(subtitle||"")}</small>
     <div class="admin-actions">
-      <button data-toggle="${action}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
+      <button type="button" data-toggle="${action}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
     </div>
   </div>`;
+}
+
+function adminProductItem(item,categoryName){
+  return `<div class="admin-item">
+    <b>${escapeText(item.name)}</b><br>
+    <small>${Number(item.price)} ₽ · ${escapeText(categoryName||"Без категории")} · ${item.active?"Активен":"Скрыт"}</small>
+    <div class="admin-actions">
+      <button type="button" data-edit-product="${escapeText(item.id)}">Редактировать</button>
+      <button type="button" data-toggle="product.toggle" data-id="${escapeText(item.id)}">${item.active?"Скрыть":"Включить"}</button>
+      <button type="button" data-delete-product="${escapeText(item.id)}" style="color:var(--danger)">Удалить</button>
+    </div>
+  </div>`;
+}
+
+function adminEditProductForm(item,categoryOptions){
+  const categoryFields=categoryOptions.map(option=>
+    `<option value="${escapeText(option.value)}"${String(option.value)===String(item.category_id)?" selected":""}>${escapeText(option.label)}</option>`
+  ).join("");
+  const types=[
+    {value:"coffee",label:"Кофе"},
+    {value:"tea",label:"Чай"},
+    {value:"cold_drink",label:"Холодный напиток"},
+    {value:"food",label:"Еда"},
+    {value:"other",label:"Другое"}
+  ];
+  const typeFields=types.map(option=>
+    `<option value="${option.value}"${option.value===item.product_type?" selected":""}>${option.label}</option>`
+  ).join("");
+  return `<form class="admin-form" data-admin-action="product.update">
+    <h3>Редактирование товара</h3>
+    <input type="hidden" name="id" value="${escapeText(item.id)}">
+    <div class="field"><label>Категория</label><select name="category_id" required>${categoryFields}</select></div>
+    <div class="field"><label>Название</label><input name="name" value="${escapeText(item.name||"")}" maxlength="100" required></div>
+    <div class="field"><label>Описание</label><textarea name="description" maxlength="500">${escapeText(item.description||"")}</textarea></div>
+    <div class="field"><label>Цена</label><input name="price" type="number" min="0" step="1" value="${Number(item.price)||0}" required></div>
+    <div class="field"><label>Ссылка на фотографию</label><input name="image_url" type="url" value="${escapeText(item.image_url||"")}" placeholder="https://..."></div>
+    <div class="field"><label>Тип товара</label><select name="product_type" required>${typeFields}</select></div>
+    <div class="field"><label>Порядок отображения</label><input name="sort_order" type="number" min="0" step="1" value="${Number(item.sort_order)||0}" required></div>
+    <button class="primary" type="submit">Сохранить изменения</button>
+    <button class="secondary" type="button" data-cancel-product-edit>Отмена</button>
+  </form>`;
 }
 
 function renderAdmin(){
@@ -717,7 +757,8 @@ function renderAdmin(){
 
   if(currentAdminTab==="products"){
     const categoryOptions=d.categories.map(c=>({value:c.id,label:c.name}));
-    content.innerHTML=adminForm("Новый товар",
+    const editingProduct=d.products.find(item=>item.id===editingProductId);
+    const createForm=adminForm("Новый товар",
       adminSelect("Категория","category_id",categoryOptions)+
       adminInput("Название","name","Например: Раф")+
       adminInput("Описание","description","Краткое описание")+
@@ -732,10 +773,11 @@ function renderAdmin(){
       ])+
       adminInput("Порядок отображения","sort_order","0","number"),
       "product.create","Добавить товар"
-    )+d.products.map(item=>{
+    );
+    const editForm=editingProduct?adminEditProductForm(editingProduct,categoryOptions):"";
+    content.innerHTML=createForm+editForm+d.products.map(item=>{
       const category=d.categories.find(c=>c.id===item.category_id);
-      return adminItem(item.name,`${item.price} ₽ · ${category?.name||"Без категории"}`,
-        "product.toggle",item.id,Boolean(item.active));
+      return adminProductItem(item,category?.name);
     }).join("");
   }
 
@@ -809,6 +851,7 @@ $("adminContent").addEventListener("submit",async event=>{
   });
   try{
     await api("api/admin",{action,data});
+    if(action==="product.update")editingProductId=null;
     showToast("Изменения сохранены");
     await loadAdmin();
     await loadMenu();
@@ -816,6 +859,39 @@ $("adminContent").addEventListener("submit",async event=>{
 });
 
 $("adminContent").addEventListener("click",async event=>{
+  const editButton=event.target.closest("[data-edit-product]");
+  if(editButton){
+    editingProductId=editButton.dataset.editProduct;
+    renderAdmin();
+    return;
+  }
+
+  const cancelButton=event.target.closest("[data-cancel-product-edit]");
+  if(cancelButton){
+    editingProductId=null;
+    renderAdmin();
+    return;
+  }
+
+  const deleteButton=event.target.closest("[data-delete-product]");
+  if(deleteButton){
+    const id=deleteButton.dataset.deleteProduct;
+    const product=adminData?.products?.find(item=>String(item.id)===String(id));
+    if(!confirm(`Удалить товар «${product?.name||"без названия"}»? Это действие нельзя отменить.`))return;
+    deleteButton.disabled=true;
+    try{
+      await api("api/admin",{action:"product.delete",data:{id}});
+      if(editingProductId===id)editingProductId=null;
+      showToast("Товар удалён");
+      await loadAdmin();
+      await loadMenu();
+    }catch(error){
+      deleteButton.disabled=false;
+      showToast(error.message);
+    }
+    return;
+  }
+
   const button=event.target.closest("[data-toggle]");
   if(!button)return;
   const action=button.dataset.toggle,id=button.dataset.id;
