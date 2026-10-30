@@ -9,420 +9,106 @@
 
 <style>
 :root{
-  --bg:#f5f1e9;
-  --card:#fffdf9;
-  --dark:#302b27;
-  --muted:#898078;
-  --gold:#b49a68;
-  --line:#e8e0d4;
-  --green:#596b50;
-  --danger:#a34e43;
+  --bg:#f5f1e9;--card:#fffdf9;--dark:#302b27;--muted:#898078;
+  --gold:#b49a68;--line:#e8e0d4;--green:#596b50;--danger:#a34e43;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--dark);
-  font-family:Arial,sans-serif;
-  padding-bottom:110px;
-}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif;padding-bottom:110px}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
-header{
-  padding:27px 20px 20px;
-  text-align:center;
-}
-.brand{
-  font-size:27px;
-  font-weight:800;
-  letter-spacing:2px;
-}
-.slogan{
-  margin-top:8px;
-  color:var(--gold);
-  font-size:10px;
-  letter-spacing:2px;
-}
-.topline{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 18px 15px;
-}
-.profile-button,.admin-button{
-  border:1px solid var(--line);
-  background:var(--card);
-  border-radius:20px;
-  padding:9px 13px;
-  color:var(--dark);
-  font-size:12px;
-}
+header{padding:27px 20px 20px;text-align:center}
+.brand{font-size:27px;font-weight:800;letter-spacing:2px}
+.slogan{margin-top:8px;color:var(--gold);font-size:10px;letter-spacing:2px}
+.topline{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:0 18px 15px}
+.profile-button,.admin-button{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:9px 13px;color:var(--dark);font-size:12px}
 .admin-button{display:none}
-.categories{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding:5px 18px 16px;
-  scrollbar-width:none;
-}
+.categories{display:flex;gap:8px;overflow-x:auto;padding:5px 18px 16px;scrollbar-width:none}
 .categories::-webkit-scrollbar{display:none}
-.category{
-  border:1px solid var(--line);
-  background:var(--card);
-  border-radius:22px;
-  padding:10px 16px;
-  white-space:nowrap;
-  color:var(--dark);
-  font-size:13px;
-}
-.category.active{
-  background:var(--dark);
-  color:white;
-  border-color:var(--dark);
-}
-.section-title{
-  margin:8px 18px 15px;
-  font-size:18px;
-  font-weight:700;
-}
-.products{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:13px;
-  padding:0 14px;
-}
-.product{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  overflow:hidden;
-  min-width:0;
-}
-.product-image{
-  height:145px;
-  background:#e9e3d9;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-.product-image img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+.category{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:10px 16px;white-space:nowrap;color:var(--dark);font-size:13px}
+.category.active{background:var(--dark);color:white;border-color:var(--dark)}
+.section-title{margin:8px 18px 15px;font-size:18px;font-weight:700}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;padding:0 14px}
+.product{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:0}
+.product-image{height:145px;background:#e9e3d9;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.product-image img{width:100%;height:100%;object-fit:cover}
 .no-image{font-size:38px;opacity:.4}
 .product-info{padding:12px}
-.product-name{
-  font-size:15px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-.product-description{
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.4;
-  min-height:29px;
-}
-.product-bottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:5px;
-  margin-top:12px;
-}
+.product-name{font-size:15px;font-weight:700;margin-bottom:6px}
+.product-description{color:var(--muted);font-size:11px;line-height:1.4;min-height:29px}
+.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-top:12px}
 .price{font-size:15px;font-weight:700}
-.add-button{
-  background:var(--dark);
-  color:white;
-  border:0;
-  border-radius:20px;
-  padding:9px 13px;
-  font-size:12px;
-}
-.empty{
-  padding:35px 20px;
-  text-align:center;
-  color:var(--muted);
-  grid-column:1/-1;
-}
-.bottom-cart{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:5;
-  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  background:rgba(245,241,233,.96);
-  border-top:1px solid var(--line);
-}
-.cart-button{
-  width:100%;
-  background:var(--dark);
-  color:white;
-  border:0;
-  border-radius:13px;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  font-weight:700;
-}
-.overlay{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  background:rgba(25,22,19,.55);
-  display:none;
-  align-items:flex-end;
-  justify-content:center;
-}
+.add-button{background:var(--dark);color:white;border:0;border-radius:20px;padding:9px 13px;font-size:12px}
+.empty{padding:35px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
+.bottom-cart{position:fixed;bottom:0;left:0;right:0;z-index:5;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(245,241,233,.96);border-top:1px solid var(--line)}
+.cart-button{width:100%;background:var(--dark);color:white;border:0;border-radius:13px;padding:16px;display:flex;justify-content:space-between;font-weight:700}
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(25,22,19,.55);display:none;align-items:flex-end;justify-content:center}
 .overlay.show{display:flex}
-.modal{
-  width:100%;
-  max-width:560px;
-  max-height:92vh;
-  overflow-y:auto;
-  background:var(--bg);
-  border-radius:22px 22px 0 0;
-  padding:22px 18px calc(22px + env(safe-area-inset-bottom));
-}
-.modal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-}
+.modal{width:100%;max-width:560px;max-height:94vh;overflow-y:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom))}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
 .modal-title{font-size:20px;font-weight:700}
-.close{
-  border:0;
-  background:#e9e2d8;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  font-size:19px;
-}
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-  margin-bottom:13px;
-}
+.close{border:0;background:#e9e2d8;width:34px;height:34px;border-radius:50%;font-size:19px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
 .field label{font-size:12px;color:var(--muted)}
-.field input,.field textarea,.field select{
-  width:100%;
-  border:1px solid var(--line);
-  background:var(--card);
-  border-radius:10px;
-  padding:13px;
-  color:var(--dark);
-  outline:none;
-}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:13px;color:var(--dark);outline:none}
 .field textarea{min-height:75px;resize:vertical}
-.primary{
-  width:100%;
-  border:0;
-  border-radius:12px;
-  padding:15px;
-  background:var(--dark);
-  color:white;
-  font-weight:700;
-}
-.secondary{
-  width:100%;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:13px;
-  background:var(--card);
-  color:var(--dark);
-  margin-top:9px;
-}
-.group{
-  margin:18px 0;
-  padding-bottom:14px;
-  border-bottom:1px solid var(--line);
-}
-.group-title{
-  font-size:15px;
-  font-weight:700;
-  margin-bottom:11px;
-}
-.group-note{
-  color:var(--muted);
-  font-size:11px;
-  margin-top:4px;
-}
-.option{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:11px 0;
-  font-size:13px;
-}
-.option label{
-  display:flex;
-  gap:9px;
-  align-items:center;
-  flex:1;
-}
+.primary{width:100%;border:0;border-radius:12px;padding:15px;background:var(--dark);color:white;font-weight:700}
+.primary:disabled{opacity:.55;cursor:not-allowed}
+.secondary{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card);color:var(--dark);margin-top:9px}
+.group{margin:18px 0;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.group-title{font-size:15px;font-weight:700;margin-bottom:11px}
+.group-note{color:var(--muted);font-size:11px;margin-top:4px}
+.option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;font-size:13px}
+.option label{display:flex;gap:9px;align-items:center;flex:1}
 .option input{accent-color:var(--dark)}
 .option-price{color:var(--muted);white-space:nowrap}
-.modal-total{
-  display:flex;
-  justify-content:space-between;
-  font-weight:700;
-  margin:18px 0;
-}
-.cart-line{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:13px;
-  margin-bottom:10px;
-}
-.cart-line-top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  font-weight:700;
-}
-.cart-details{
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.5;
-  margin-top:7px;
-}
-.cart-line-bottom{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:10px;
-}
-.quantity{
-  display:flex;
-  align-items:center;
-  gap:13px;
-}
-.quantity button{
-  width:29px;
-  height:29px;
-  border:0;
-  border-radius:50%;
-  background:#e9e2d8;
-}
-.remove{
-  color:var(--danger);
-  border:0;
-  background:none;
-  font-size:12px;
-}
-.total-row{
-  display:flex;
-  justify-content:space-between;
-  padding:16px 0;
-  font-weight:700;
-  font-size:18px;
-}
-.notice{
-  padding:12px;
-  background:#eee8dd;
-  border-radius:10px;
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:13px;
-}
-.admin-tabs{
-  display:flex;
-  gap:7px;
-  overflow-x:auto;
-  margin-bottom:16px;
-}
-.admin-tab{
-  white-space:nowrap;
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:var(--card);
-  padding:9px 13px;
-  font-size:12px;
-}
-.admin-tab.active{
-  background:var(--dark);
-  color:white;
-}
-.admin-item{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:11px;
-  padding:12px;
-  margin-bottom:9px;
-  font-size:13px;
-}
+.modal-total{display:flex;justify-content:space-between;font-weight:700;margin:18px 0}
+.cart-line{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}
+.cart-line-top{display:flex;justify-content:space-between;gap:10px;font-weight:700}
+.cart-details{color:var(--muted);font-size:11px;line-height:1.5;margin-top:7px}
+.cart-line-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.quantity{display:flex;align-items:center;gap:13px}
+.quantity button{width:29px;height:29px;border:0;border-radius:50%;background:#e9e2d8}
+.remove{color:var(--danger);border:0;background:none;font-size:12px}
+.total-row{display:flex;justify-content:space-between;padding:16px 0;font-weight:700;font-size:18px}
+.notice{padding:12px;background:#eee8dd;border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:13px}
+.admin-tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:16px}
+.admin-tab{white-space:nowrap;border:1px solid var(--line);border-radius:18px;background:var(--card);padding:9px 13px;font-size:12px}
+.admin-tab.active{background:var(--dark);color:white}
+.admin-item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:9px;font-size:13px}
 .admin-item small{color:var(--muted)}
-.admin-actions{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
-.admin-actions button{
-  border:1px solid var(--line);
-  background:#f2ede5;
-  border-radius:8px;
-  padding:8px 10px;
-  font-size:11px;
-}
-.admin-form{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:14px;
-  margin-bottom:15px;
-}
+.admin-actions{display:flex;gap:8px;margin-top:10px}
+.admin-actions button{border:1px solid var(--line);background:#f2ede5;border-radius:8px;padding:8px 10px;font-size:11px}
+.admin-form{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:15px}
 .admin-form h3{font-size:15px;margin:0 0 13px}
-.check-row{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  margin:10px 0;
-}
-.toast{
-  position:fixed;
-  z-index:50;
-  bottom:95px;
-  left:50%;
-  transform:translateX(-50%);
-  background:var(--dark);
-  color:white;
-  border-radius:20px;
-  padding:12px 18px;
-  font-size:12px;
-  display:none;
-  max-width:90%;
-  text-align:center;
-}
+.check-row{display:flex;align-items:center;gap:8px;font-size:12px;margin:10px 0}
+.toast{position:fixed;z-index:50;bottom:95px;left:50%;transform:translateX(-50%);background:var(--dark);color:white;border-radius:20px;padding:12px 18px;font-size:12px;display:none;max-width:90%;text-align:center}
 .toast.show{display:block}
-.loading{
-  text-align:center;
-  color:var(--muted);
-  padding:35px;
-  grid-column:1/-1;
-}
-@media(min-width:600px){
-  .products{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px;margin:auto}
-}
+.loading{text-align:center;color:var(--muted);padding:35px;grid-column:1/-1}
+.checkout-section{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:12px}
+.checkout-section-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.checkout-product{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.checkout-product:last-child{border-bottom:0}
+.checkout-product small{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.4}
+.checkout-customer{font-size:13px;line-height:1.7}
+.error-box{display:none;background:#f7e7e3;color:#963e35;border:1px solid #e8c7c0;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:13px}
+.error-box.show{display:block}
+.success-mark{width:70px;height:70px;border-radius:50%;background:#e3eadf;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:36px;margin:25px auto 18px}
+.success-title{text-align:center;font-size:22px;font-weight:800;margin-bottom:9px}
+.success-text{text-align:center;color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:22px}
+.success-number{text-align:center;font-size:13px;font-weight:700;margin-bottom:20px}
+@media(min-width:600px){.products{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px;margin:auto}}
 </style>
 </head>
 
 <body>
-
 <header>
   <div class="brand">#ЗБС КОФЕЙНЯ</div>
   <div class="slogan">СНАЧАЛА КОФЕ, ПОТОМ ДЕЛА</div>
 </header>
 
 <div class="topline">
-  <button class="profile-button" id="profileButton">👤 Профиль</button>
   <button class="admin-button" id="adminButton">⚙ Администрирование</button>
+  <button class="profile-button" id="profileButton">👤 Профиль</button>
 </div>
 
 <div class="categories" id="categories">
@@ -430,9 +116,7 @@ header{
 </div>
 
 <div class="section-title">Наше меню</div>
-<div class="products" id="products">
-  <div class="loading">Загружаем меню...</div>
-</div>
+<div class="products" id="products"><div class="loading">Загружаем меню...</div></div>
 
 <div class="bottom-cart">
   <button class="cart-button" id="openCart">
@@ -441,6 +125,7 @@ header{
   </button>
 </div>
 
+<!-- Настройка товара -->
 <div class="overlay" id="productOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -448,14 +133,12 @@ header{
       <button class="close" data-close="productOverlay">×</button>
     </div>
     <div id="productModalContent"></div>
-    <div class="modal-total">
-      <span>Стоимость</span>
-      <span id="productModalTotal">0 ₽</span>
-    </div>
+    <div class="modal-total"><span>Стоимость</span><span id="productModalTotal">0 ₽</span></div>
     <button class="primary" id="addConfiguredProduct">Добавить в корзину</button>
   </div>
 </div>
 
+<!-- Корзина -->
 <div class="overlay" id="cartOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -463,22 +146,19 @@ header{
       <button class="close" data-close="cartOverlay">×</button>
     </div>
     <div id="cartContent"></div>
-    <div class="total-row">
-      <span>Итого</span><span id="cartModalTotal">0 ₽</span>
-    </div>
+    <div class="total-row"><span>Итого</span><span id="cartModalTotal">0 ₽</span></div>
     <button class="primary" id="checkoutButton">Оформить предзаказ</button>
   </div>
 </div>
 
+<!-- Профиль -->
 <div class="overlay" id="profileOverlay">
   <div class="modal">
     <div class="modal-head">
       <div class="modal-title">Ваш профиль</div>
       <button class="close" data-close="profileOverlay">×</button>
     </div>
-    <div class="notice" id="profileNotice">
-      Данные используются для связи с бариста.
-    </div>
+    <div class="notice" id="profileNotice">Данные используются для связи с бариста.</div>
     <div class="field">
       <label>Ваше имя</label>
       <input id="profileName" maxlength="100" placeholder="Как к вам обращаться">
@@ -491,24 +171,57 @@ header{
   </div>
 </div>
 
+<!-- Полноценное оформление -->
 <div class="overlay" id="checkoutOverlay">
   <div class="modal">
     <div class="modal-head">
       <div class="modal-title">Оформление заказа</div>
       <button class="close" data-close="checkoutOverlay">×</button>
     </div>
-    <div class="notice" id="checkoutCustomer"></div>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">Ваш заказ</div>
+      <div id="checkoutItems"></div>
+      <div class="total-row" style="padding-bottom:0">
+        <span>Итого</span><span id="checkoutTotal">0 ₽</span>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">Контактные данные</div>
+      <div class="checkout-customer" id="checkoutCustomer"></div>
+      <button class="secondary" id="editProfileFromCheckout">Изменить данные</button>
+    </div>
+
     <div class="field">
       <label>Комментарий к заказу (необязательно)</label>
       <textarea id="orderComment" maxlength="500" placeholder="Например: без крышки, пожалуйста"></textarea>
     </div>
-    <div class="total-row">
-      <span>К оплате</span><span id="checkoutTotal">0 ₽</span>
-    </div>
+
+    <div class="error-box" id="checkoutError"></div>
     <button class="primary" id="sendOrder">Отправить предзаказ</button>
   </div>
 </div>
 
+<!-- Успешная отправка -->
+<div class="overlay" id="successOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Готово</div>
+      <button class="close" data-close="successOverlay">×</button>
+    </div>
+    <div class="success-mark">✓</div>
+    <div class="success-title">Предзаказ отправлен!</div>
+    <div class="success-text">
+      Бариста получили ваш заказ и скоро займутся его приготовлением.
+      Спасибо, что выбираете #ЗБС КОФЕЙНЯ.
+    </div>
+    <div class="success-number" id="successOrderNumber"></div>
+    <button class="primary" id="successDone">Отлично</button>
+  </div>
+</div>
+
+<!-- Админка -->
 <div class="overlay" id="adminOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -531,790 +244,598 @@ header{
 
 <script>
 const API_URL = "https://coffee-orders-api.eduard-raikovski.workers.dev/";
-
 const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-}
+if(tg){tg.ready();tg.expand()}
 
 const initData = tg?.initData || "";
+let categories=[],products=[],selectedCategory="all",cart=[];
+let currentProduct=null,currentAdminTab="products",adminData=null;
+let profile={name:"",phone:""},registered=false;
 
-let categories = [];
-let products = [];
-let selectedCategory = "all";
-let cart = [];
-let currentProduct = null;
-let currentAdminTab = "products";
-let adminData = null;
-let profile = {name:"",phone:""};
-let registered = false;
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-
-function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
+function showToast(message){
+  const toast=$("toast");
+  toast.textContent=message;
   toast.classList.add("show");
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+  showToast.timer=setTimeout(()=>toast.classList.remove("show"),2600);
 }
+function openModal(id){$(id).classList.add("show")}
+function closeModal(id){$(id).classList.remove("show")}
 
-function openModal(id) {
-  $(id).classList.add("show");
-}
-
-function closeModal(id) {
-  $(id).classList.remove("show");
-}
-
-document.querySelectorAll("[data-close]").forEach(button => {
-  button.addEventListener("click", () => closeModal(button.dataset.close));
+document.querySelectorAll("[data-close]").forEach(button=>{
+  button.addEventListener("click",()=>closeModal(button.dataset.close));
 });
-
-document.querySelectorAll(".overlay").forEach(overlay => {
-  overlay.addEventListener("click", event => {
-    if (event.target === overlay) closeModal(overlay.id);
+document.querySelectorAll(".overlay").forEach(overlay=>{
+  overlay.addEventListener("click",event=>{
+    if(event.target===overlay)closeModal(overlay.id);
   });
 });
 
-async function api(path, body = {}) {
-  const response = await fetch(API_URL + path.replace(/^\//, ""), {
+async function api(path,body={}){
+  const response=await fetch(API_URL+path.replace(/^\//,""),{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({...body,initData})
   });
-
   let result;
-  try {
-    result = await response.json();
-  } catch {
-    throw new Error("Сервер вернул некорректный ответ");
-  }
-
-  if (!response.ok) {
-    throw new Error(result.error || "Ошибка запроса");
-  }
-
+  try{result=await response.json()}
+  catch{throw new Error("Сервер вернул некорректный ответ")}
+  if(!response.ok)throw new Error(result.error||"Ошибка запроса");
   return result;
 }
 
-// Профиль
-async function loadProfile() {
-  if (!initData) {
-    $("profileNotice").textContent =
-      "Откройте приложение через Telegram, чтобы оформлять предзаказы.";
-    $("profileButton").textContent = "👤 Профиль";
-    return;
-  }
-
-  try {
-    const result = await api("api/profile");
-
-    registered = Boolean(result.registered);
-    profile = {
-      name:result.name || "",
-      phone:result.phone || ""
-    };
-
-    $("profileName").value = profile.name;
-    $("profilePhone").value = profile.phone;
-
-    if (!registered) {
-      $("profileNotice").textContent =
-        "Сначала подтвердите Telegram-контакт через бота, затем заполните имя и телефон.";
-      openModal("profileOverlay");
-    } else {
-      $("profileNotice").textContent =
-        "Данные сохранены. Их можно изменить в любой момент.";
-    }
-
-    const user = tg?.initDataUnsafe?.user;
-    if (String(user?.id || "") === "931110633") {
-      $("adminButton").style.display = "block";
-    }
-
-  } catch (error) {
-    showToast(error.message);
-  }
-}
-
-$("profileButton").addEventListener("click", () => {
-  $("profileName").value = profile.name;
-  $("profilePhone").value = profile.phone;
-  openModal("profileOverlay");
-});
-
-$("saveProfile").addEventListener("click", async () => {
-  const name = $("profileName").value.trim();
-  const phone = $("profilePhone").value.trim();
-
-  if (name.length < 2 || phone.length < 5) {
-    showToast("Укажите имя и номер телефона");
-    return;
-  }
-
-  try {
-    const result = await api("api/register", {name,phone});
-    profile = {name:result.name,phone:result.phone};
-    registered = true;
-    closeModal("profileOverlay");
-    showToast("Профиль сохранён");
-  } catch (error) {
-    showToast(error.message);
-  }
-});
-
-// Загрузка меню
-async function loadMenu() {
-  $("products").innerHTML = '<div class="loading">Загружаем меню...</div>';
-
-  try {
-    const result = await api("api/menu");
-    categories = result.categories || [];
-    products = result.products || [];
-    renderCategories();
-    renderProducts();
-  } catch (error) {
-    $("products").innerHTML =
-      `<div class="empty">Не удалось загрузить меню.<br>${escapeText(error.message)}</div>`;
-  }
-}
-
-function escapeText(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
+function escapeText(value){
+  return String(value).replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   })[c]);
 }
 
-function renderCategories() {
-  const container = $("categories");
-  container.innerHTML = "";
+// ПРОФИЛЬ
+async function loadProfile(){
+  if(!initData){
+    $("profileNotice").textContent="Откройте приложение через Telegram, чтобы оформлять предзаказы.";
+    return;
+  }
+  try{
+    const result=await api("api/profile");
+    registered=Boolean(result.registered);
+    profile={name:result.name||"",phone:result.phone||""};
+    $("profileName").value=profile.name;
+    $("profilePhone").value=profile.phone;
 
-  const all = document.createElement("button");
-  all.className = "category" + (selectedCategory === "all" ? " active" : "");
-  all.textContent = "Все";
-  all.onclick = () => {
-    selectedCategory = "all";
+    if(!registered){
+      $("profileNotice").textContent="Заполните имя и номер телефона для оформления предзаказов.";
+      openModal("profileOverlay");
+    }else{
+      $("profileNotice").textContent="Данные сохранены. Их можно изменить в любой момент.";
+    }
+
+    const user=tg?.initDataUnsafe?.user;
+    if(String(user?.id||"")==="931110633")$("adminButton").style.display="block";
+  }catch(error){showToast(error.message)}
+}
+
+$("profileButton").addEventListener("click",()=>{
+  $("profileName").value=profile.name;
+  $("profilePhone").value=profile.phone;
+  openModal("profileOverlay");
+});
+
+$("saveProfile").addEventListener("click",async()=>{
+  const name=$("profileName").value.trim();
+  const phone=$("profilePhone").value.trim();
+  if(name.length<2||phone.length<5){showToast("Укажите имя и номер телефона");return}
+  const button=$("saveProfile");
+  button.disabled=true;
+  try{
+    const result=await api("api/register",{name,phone});
+    profile={name:result.name||name,phone:result.phone||phone};
+    registered=true;
+    $("profileName").value=profile.name;
+    $("profilePhone").value=profile.phone;
+    closeModal("profileOverlay");
+    showToast("Профиль сохранён");
+  }catch(error){showToast(error.message)}
+  finally{button.disabled=false}
+});
+
+// МЕНЮ
+async function loadMenu(){
+  $("products").innerHTML='<div class="loading">Загружаем меню...</div>';
+  try{
+    const result=await api("api/menu");
+    categories=result.categories||[];
+    products=result.products||[];
     renderCategories();
     renderProducts();
+  }catch(error){
+    $("products").innerHTML=`<div class="empty">Не удалось загрузить меню.<br>${escapeText(error.message)}</div>`;
+  }
+}
+
+function renderCategories(){
+  const container=$("categories");
+  container.innerHTML="";
+  const all=document.createElement("button");
+  all.className="category"+(selectedCategory==="all"?" active":"");
+  all.textContent="Все";
+  all.onclick=()=>{
+    selectedCategory="all";renderCategories();renderProducts();
   };
   container.appendChild(all);
-
-  categories.forEach(category => {
-    const button = document.createElement("button");
-    button.className = "category" +
-      (selectedCategory === category.id ? " active" : "");
-    button.textContent = category.name;
-    button.onclick = () => {
-      selectedCategory = category.id;
-      renderCategories();
-      renderProducts();
+  categories.forEach(category=>{
+    const button=document.createElement("button");
+    button.className="category"+(selectedCategory===category.id?" active":"");
+    button.textContent=category.name;
+    button.onclick=()=>{
+      selectedCategory=category.id;renderCategories();renderProducts();
     };
     container.appendChild(button);
   });
 }
 
-function renderProducts() {
-  const container = $("products");
-  container.innerHTML = "";
-
-  const visible = products.filter(product =>
-    selectedCategory === "all" || product.category_id === selectedCategory
+function renderProducts(){
+  const container=$("products");
+  container.innerHTML="";
+  const visible=products.filter(product=>
+    selectedCategory==="all"||product.category_id===selectedCategory
   );
-
-  if (!visible.length) {
-    container.innerHTML = '<div class="empty">В этой категории пока нет товаров.</div>';
+  if(!visible.length){
+    container.innerHTML='<div class="empty">В этой категории пока нет товаров.</div>';
     return;
   }
-
-  visible.forEach(product => {
-    const card = document.createElement("article");
-    card.className = "product";
-
-    const image = product.image_url
-      ? `<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" onerror="this.parentElement.innerHTML='<span class=no-image>☕</span>'">`
-      : '<span class="no-image">☕</span>';
-
-    card.innerHTML = `
+  visible.forEach(product=>{
+    const card=document.createElement("article");
+    card.className="product";
+    const image=product.image_url
+      ?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" onerror="this.parentElement.innerHTML='<span class=no-image>☕</span>'">`
+      :'<span class="no-image">☕</span>';
+    card.innerHTML=`
       <div class="product-image">${image}</div>
       <div class="product-info">
         <div class="product-name">${escapeText(product.name)}</div>
-        <div class="product-description">${escapeText(product.description || "")}</div>
+        <div class="product-description">${escapeText(product.description||"")}</div>
         <div class="product-bottom">
           <span class="price">${Number(product.price)} ₽</span>
           <button class="add-button">Выбрать</button>
         </div>
-      </div>
-    `;
-
-    card.querySelector(".add-button").onclick = () => openProduct(product);
+      </div>`;
+    card.querySelector(".add-button").onclick=()=>openProduct(product);
     container.appendChild(card);
   });
 }
 
-// Настройка напитка
-function openProduct(product) {
-  currentProduct = product;
+// НАСТРОЙКИ ТОВАРА
+function openProduct(product){
+  currentProduct=product;
+  $("productModalTitle").textContent=product.name;
+  const content=$("productModalContent");
+  content.innerHTML="";
+  const groups=product.groups||[];
 
-  $("productModalTitle").textContent = product.name;
-  const content = $("productModalContent");
-  content.innerHTML = "";
-
-  const groups = product.groups || [];
-
-  if (!groups.length) {
-    content.innerHTML =
-      '<div class="notice">Для этого товара нет дополнительных настроек.</div>';
+  if(!groups.length){
+    content.innerHTML='<div class="notice">Для этого товара нет дополнительных настроек.</div>';
   }
 
-  groups.forEach(group => {
-    const section = document.createElement("div");
-    section.className = "group";
-
-    const note = group.selection_type === "single"
-      ? "Можно выбрать один вариант"
-      : `Можно выбрать до ${group.max_select} вариантов`;
-
-    section.innerHTML = `
+  groups.forEach(group=>{
+    const section=document.createElement("div");
+    section.className="group";
+    const note=group.selection_type==="single"
+      ?"Можно выбрать один вариант"
+      :`Можно выбрать до ${group.max_select} вариантов`;
+    section.innerHTML=`
       <div class="group-title">${escapeText(group.name)}</div>
-      <div class="group-note">${note}${group.required ? " · обязательно" : ""}</div>
-    `;
+      <div class="group-note">${note}${group.required?" · обязательно":""}</div>`;
+    const inputType=group.selection_type==="single"?"radio":"checkbox";
+    const groupName="group_"+group.id;
 
-    const inputType = group.selection_type === "single" ? "radio" : "checkbox";
-    const groupName = "group_" + group.id;
-
-    (group.modifiers || []).forEach(modifier => {
-      const row = document.createElement("div");
-      row.className = "option";
-
-      const label = document.createElement("label");
-      const input = document.createElement("input");
-      input.type = inputType;
-      input.name = groupName;
-      input.value = modifier.id;
-
-      const title = document.createElement("span");
-      title.textContent = modifier.name;
-
+    (group.modifiers||[]).forEach(modifier=>{
+      const row=document.createElement("div");
+      row.className="option";
+      const label=document.createElement("label");
+      const input=document.createElement("input");
+      input.type=inputType;
+      input.name=groupName;
+      input.value=modifier.id;
+      const title=document.createElement("span");
+      title.textContent=modifier.name;
       label.append(input,title);
-
-      const price = document.createElement("span");
-      price.className = "option-price";
-      price.textContent = Number(modifier.price_delta) > 0
-        ? `+${modifier.price_delta} ₽`
-        : "Бесплатно";
-
+      const price=document.createElement("span");
+      price.className="option-price";
+      price.textContent=Number(modifier.price_delta)>0?`+${modifier.price_delta} ₽`:"Бесплатно";
       row.append(label,price);
       section.appendChild(row);
-
-      input.addEventListener("change", updateProductTotal);
+      input.addEventListener("change",updateProductTotal);
     });
-
     content.appendChild(section);
   });
-
   updateProductTotal();
   openModal("productOverlay");
 }
 
-function getSelectedModifiers() {
-  if (!currentProduct) return [];
-
-  return [...$("productModalContent").querySelectorAll("input:checked")]
-    .map(input => {
-      const group = (currentProduct.groups || []).find(g =>
-        (g.modifiers || []).some(m => m.id === input.value)
-      );
-
-      const modifier = group?.modifiers.find(m => m.id === input.value);
-
-      return modifier ? {
-        id:modifier.id,
-        name:modifier.name,
-        price_delta:Number(modifier.price_delta)
-      } : null;
-    })
-    .filter(Boolean);
+function getSelectedModifiers(){
+  if(!currentProduct)return[];
+  return [...$("productModalContent").querySelectorAll("input:checked")].map(input=>{
+    const group=(currentProduct.groups||[]).find(g=>
+      (g.modifiers||[]).some(m=>m.id===input.value)
+    );
+    const modifier=group?.modifiers.find(m=>m.id===input.value);
+    return modifier?{id:modifier.id,name:modifier.name,price_delta:Number(modifier.price_delta)}:null;
+  }).filter(Boolean);
 }
 
-function updateProductTotal() {
-  if (!currentProduct) return;
-
-  const additions = getSelectedModifiers().reduce(
-    (sum,item) => sum + item.price_delta,0
-  );
-
-  $("productModalTotal").textContent =
-    (Number(currentProduct.price) + additions) + " ₽";
+function updateProductTotal(){
+  if(!currentProduct)return;
+  const additions=getSelectedModifiers().reduce((sum,item)=>sum+item.price_delta,0);
+  $("productModalTotal").textContent=(Number(currentProduct.price)+additions)+" ₽";
 }
 
-$("addConfiguredProduct").addEventListener("click", () => {
-  if (!currentProduct) return;
+$("addConfiguredProduct").addEventListener("click",()=>{
+  if(!currentProduct)return;
+  const selected=getSelectedModifiers();
 
-  const selected = getSelectedModifiers();
-
-  for (const group of currentProduct.groups || []) {
-    const count = selected.filter(item =>
-      group.modifiers.some(modifier => modifier.id === item.id)
+  for(const group of currentProduct.groups||[]){
+    const count=selected.filter(item=>
+      group.modifiers.some(modifier=>modifier.id===item.id)
     ).length;
-
-    const minimum = group.required
-      ? Math.max(1,Number(group.min_select))
-      : Number(group.min_select);
-
-    if (count < minimum || count > Number(group.max_select)) {
+    const minimum=group.required?Math.max(1,Number(group.min_select)):Number(group.min_select);
+    if(count<minimum||count>Number(group.max_select)){
       showToast(`Проверь выбор: ${group.name}`);
       return;
     }
   }
 
-  const key = currentProduct.id + "|" +
-    selected.map(item => item.id).sort().join(",");
-
-  const existing = cart.find(item => item.key === key);
-
-  if (existing) {
-    existing.quantity++;
-  } else {
-    const additions = selected.reduce(
-      (sum,item) => sum + item.price_delta,0
-    );
-
+  const key=currentProduct.id+"|"+selected.map(item=>item.id).sort().join(",");
+  const existing=cart.find(item=>item.key===key);
+  if(existing){existing.quantity++}
+  else{
+    const additions=selected.reduce((sum,item)=>sum+item.price_delta,0);
     cart.push({
-      key,
-      productId:currentProduct.id,
-      name:currentProduct.name,
-      basePrice:Number(currentProduct.price),
-      modifiers:selected,
-      unitPrice:Number(currentProduct.price) + additions,
-      quantity:1
+      key,productId:currentProduct.id,name:currentProduct.name,
+      basePrice:Number(currentProduct.price),modifiers:selected,
+      unitPrice:Number(currentProduct.price)+additions,quantity:1
     });
   }
-
   closeModal("productOverlay");
   renderCartButton();
   showToast("Добавлено в корзину");
 });
 
-// Корзина
-function cartTotal() {
-  return cart.reduce((sum,item) => sum + item.unitPrice * item.quantity,0);
+// КОРЗИНА
+function cartTotal(){return cart.reduce((sum,item)=>sum+item.unitPrice*item.quantity,0)}
+function cartCount(){return cart.reduce((sum,item)=>sum+item.quantity,0)}
+
+function renderCartButton(){
+  $("cartCount").textContent=cartCount();
+  $("cartTotal").textContent=cartTotal()+" ₽";
 }
 
-function cartCount() {
-  return cart.reduce((sum,item) => sum + item.quantity,0);
-}
-
-function renderCartButton() {
-  $("cartCount").textContent = cartCount();
-  $("cartTotal").textContent = cartTotal() + " ₽";
-}
-
-function renderCart() {
-  const container = $("cartContent");
-  container.innerHTML = "";
-
-  if (!cart.length) {
-    container.innerHTML = '<div class="empty">Корзина пока пуста.</div>';
-    $("cartModalTotal").textContent = "0 ₽";
-    $("checkoutButton").disabled = true;
+function renderCart(){
+  const container=$("cartContent");
+  container.innerHTML="";
+  if(!cart.length){
+    container.innerHTML='<div class="empty">Корзина пока пуста.</div>';
+    $("cartModalTotal").textContent="0 ₽";
+    $("checkoutButton").disabled=true;
     return;
   }
+  $("checkoutButton").disabled=false;
 
-  $("checkoutButton").disabled = false;
-
-  cart.forEach(item => {
-    const line = document.createElement("div");
-    line.className = "cart-line";
-
-    const details = item.modifiers.length
-      ? item.modifiers.map(modifier =>
-          `${escapeText(modifier.name)} (+${modifier.price_delta} ₽)`
-        ).join("<br>")
-      : "Без добавок";
-
-    line.innerHTML = `
-      <div class="cart-line-top">
-        <span>${escapeText(item.name)}</span>
-        <span>${item.unitPrice * item.quantity} ₽</span>
-      </div>
+  cart.forEach(item=>{
+    const line=document.createElement("div");
+    line.className="cart-line";
+    const details=item.modifiers.length
+      ?item.modifiers.map(m=>`${escapeText(m.name)} (${m.price_delta>0?"+"+m.price_delta+" ₽":"бесплатно"})`).join("<br>")
+      :"Без добавок";
+    line.innerHTML=`
+      <div class="cart-line-top"><span>${escapeText(item.name)}</span><span>${item.unitPrice*item.quantity} ₽</span></div>
       <div class="cart-details">${details}</div>
       <div class="cart-line-bottom">
         <div class="quantity">
-          <button data-action="minus">−</button>
-          <span>${item.quantity}</span>
+          <button data-action="minus">−</button><span>${item.quantity}</span>
           <button data-action="plus">+</button>
         </div>
         <button class="remove">Удалить</button>
-      </div>
-    `;
-
-    line.querySelector('[data-action="minus"]').onclick = () => {
+      </div>`;
+    line.querySelector('[data-action="minus"]').onclick=()=>{
       item.quantity--;
-      if (item.quantity <= 0) cart = cart.filter(x => x.key !== item.key);
-      renderCart();
-      renderCartButton();
+      if(item.quantity<=0)cart=cart.filter(x=>x.key!==item.key);
+      renderCart();renderCartButton();
     };
-
-    line.querySelector('[data-action="plus"]').onclick = () => {
-      if (item.quantity >= 20) return showToast("Максимум 20 штук");
-      item.quantity++;
-      renderCart();
-      renderCartButton();
+    line.querySelector('[data-action="plus"]').onclick=()=>{
+      if(item.quantity>=20)return showToast("Максимум 20 штук");
+      item.quantity++;renderCart();renderCartButton();
     };
-
-    line.querySelector(".remove").onclick = () => {
-      cart = cart.filter(x => x.key !== item.key);
-      renderCart();
-      renderCartButton();
+    line.querySelector(".remove").onclick=()=>{
+      cart=cart.filter(x=>x.key!==item.key);renderCart();renderCartButton();
     };
-
     container.appendChild(line);
   });
-
-  $("cartModalTotal").textContent = cartTotal() + " ₽";
+  $("cartModalTotal").textContent=cartTotal()+" ₽";
 }
 
-$("openCart").addEventListener("click", () => {
-  renderCart();
-  openModal("cartOverlay");
+$("openCart").addEventListener("click",()=>{
+  renderCart();openModal("cartOverlay");
 });
 
-// Оформление
-$("checkoutButton").addEventListener("click", async () => {
-  if (!cart.length) return;
+// ОФОРМЛЕНИЕ ЗАКАЗА
+function renderCheckout(){
+  const container=$("checkoutItems");
+  container.innerHTML="";
+  cart.forEach(item=>{
+    const row=document.createElement("div");
+    row.className="checkout-product";
+    const modifiers=item.modifiers.length
+      ?item.modifiers.map(m=>escapeText(m.name)+(m.price_delta>0?` (+${m.price_delta} ₽)`:"")).join(", ")
+      :"Без добавок";
+    row.innerHTML=`
+      <div>
+        <b>${escapeText(item.name)} × ${item.quantity}</b>
+        <small>${modifiers}</small>
+      </div>
+      <b>${item.unitPrice*item.quantity} ₽</b>`;
+    container.appendChild(row);
+  });
+  $("checkoutCustomer").innerHTML=
+    `<b>${escapeText(profile.name)}</b><br>${escapeText(profile.phone)}`;
+  $("checkoutTotal").textContent=cartTotal()+" ₽";
+  $("checkoutError").classList.remove("show");
+  $("checkoutError").textContent="";
+}
 
-  if (!initData) {
-    showToast("Откройте приложение через Telegram");
-    return;
-  }
-
-  if (!registered) {
+$("checkoutButton").addEventListener("click",()=>{
+  if(!cart.length)return;
+  if(!initData){showToast("Откройте приложение через Telegram");return}
+  if(!registered){
     closeModal("cartOverlay");
     openModal("profileOverlay");
     showToast("Сначала заполните профиль");
     return;
   }
-
-  $("checkoutCustomer").textContent =
-    `${profile.name} · ${profile.phone}`;
-
-  $("checkoutTotal").textContent = cartTotal() + " ₽";
+  renderCheckout();
   closeModal("cartOverlay");
   openModal("checkoutOverlay");
 });
 
-$("sendOrder").addEventListener("click", async () => {
-  if (!cart.length) return;
+$("editProfileFromCheckout").addEventListener("click",()=>{
+  $("profileName").value=profile.name;
+  $("profilePhone").value=profile.phone;
+  closeModal("checkoutOverlay");
+  openModal("profileOverlay");
+});
 
-  const button = $("sendOrder");
-  button.disabled = true;
-  button.textContent = "Отправляем...";
+$("sendOrder").addEventListener("click",async()=>{
+  if(!cart.length)return;
+  const button=$("sendOrder");
+  const errorBox=$("checkoutError");
+  errorBox.classList.remove("show");
+  errorBox.textContent="";
+  button.disabled=true;
+  button.textContent="Отправляем...";
 
-  try {
-    const result = await api("api/orders", {
-      items:cart.map(item => ({
+  try{
+    const result=await api("api/orders",{
+      items:cart.map(item=>({
         productId:item.productId,
         quantity:item.quantity,
-        modifiers:item.modifiers.map(modifier => modifier.id)
+        modifiers:item.modifiers.map(modifier=>modifier.id)
       })),
       comment:$("orderComment").value.trim()
     });
 
-    cart = [];
-    $("orderComment").value = "";
+    cart=[];
+    $("orderComment").value="";
     renderCartButton();
     closeModal("checkoutOverlay");
 
-    showToast("Предзаказ отправлен бариста!");
-    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
+    const orderNumber=result.orderId||result.order_id||result.id||"";
+    $("successOrderNumber").textContent=orderNumber
+      ?"Номер заказа: "+orderNumber
+      :"";
+    openModal("successOverlay");
 
-  } catch (error) {
-    showToast(error.message);
-  } finally {
-    button.disabled = false;
-    button.textContent = "Отправить предзаказ";
+    if(tg?.HapticFeedback)tg.HapticFeedback.notificationOccurred("success");
+  }catch(error){
+    errorBox.textContent="Не удалось отправить заказ: "+error.message+
+      ". Ваш заказ остался в корзине. Проверьте соединение и попробуйте ещё раз.";
+    errorBox.classList.add("show");
+  }finally{
+    button.disabled=false;
+    button.textContent="Отправить предзаказ";
   }
 });
 
-// Админ-панель
-$("adminButton").addEventListener("click", async () => {
+$("successDone").addEventListener("click",()=>{
+  closeModal("successOverlay");
+});
+
+// АДМИН-ПАНЕЛЬ
+$("adminButton").addEventListener("click",async()=>{
   openModal("adminOverlay");
   await loadAdmin();
 });
 
-async function loadAdmin() {
-  $("adminContent").innerHTML = '<div class="loading">Загружаем данные...</div>';
-
-  try {
-    adminData = await api("api/admin", {action:"list"});
+async function loadAdmin(){
+  $("adminContent").innerHTML='<div class="loading">Загружаем данные...</div>';
+  try{
+    adminData=await api("api/admin",{action:"list"});
     renderAdmin();
-  } catch (error) {
-    $("adminContent").textContent = error.message;
-  }
+  }catch(error){$("adminContent").textContent=error.message}
 }
 
-$("adminTabs").addEventListener("click", event => {
-  const button = event.target.closest("[data-tab]");
-  if (!button) return;
-
-  currentAdminTab = button.dataset.tab;
-
-  document.querySelectorAll(".admin-tab").forEach(tab =>
-    tab.classList.toggle("active",tab === button)
+$("adminTabs").addEventListener("click",event=>{
+  const button=event.target.closest("[data-tab]");
+  if(!button)return;
+  currentAdminTab=button.dataset.tab;
+  document.querySelectorAll(".admin-tab").forEach(tab=>
+    tab.classList.toggle("active",tab===button)
   );
-
   renderAdmin();
 });
 
-function adminInput(label,name,placeholder="",type="text") {
-  return `
-    <div class="field">
-      <label>${label}</label>
-      <input name="${name}" type="${type}" placeholder="${placeholder}">
+function adminInput(label,name,placeholder="",type="text"){
+  return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" placeholder="${placeholder}"></div>`;
+}
+
+function adminSelect(label,name,options){
+  return `<div class="field"><label>${label}</label><select name="${name}">
+    ${options.map(option=>`<option value="${escapeText(option.value)}">${escapeText(option.label)}</option>`).join("")}
+  </select></div>`;
+}
+
+function adminForm(title,fields,action,buttonText="Сохранить"){
+  return `<form class="admin-form" data-admin-action="${action}">
+    <h3>${title}</h3>${fields}
+    <button class="primary" type="submit">${buttonText}</button>
+  </form>`;
+}
+
+function adminItem(title,subtitle,action,id,active=true){
+  return `<div class="admin-item">
+    <b>${escapeText(title)}</b><br><small>${escapeText(subtitle||"")}</small>
+    <div class="admin-actions">
+      <button data-toggle="${action}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
     </div>
-  `;
+  </div>`;
 }
 
-function adminSelect(label,name,options) {
-  return `
-    <div class="field">
-      <label>${label}</label>
-      <select name="${name}">
-        ${options.map(option =>
-          `<option value="${escapeText(option.value)}">${escapeText(option.label)}</option>`
-        ).join("")}
-      </select>
-    </div>
-  `;
+function renderAdmin(){
+  if(!adminData)return;
+  const d=adminData,content=$("adminContent");
+
+  if(currentAdminTab==="categories"){
+    content.innerHTML=adminForm("Новая категория",
+      adminInput("Название","name","Например: Десерты")+
+      adminInput("Порядок отображения","sort_order","0","number"),
+      "category.create","Добавить категорию"
+    )+d.categories.map(item=>
+      adminItem(item.name,"Порядок: "+item.sort_order,"category.toggle",item.id,Boolean(item.active))
+    ).join("");
+  }
+
+  if(currentAdminTab==="products"){
+    const categoryOptions=d.categories.map(c=>({value:c.id,label:c.name}));
+    content.innerHTML=adminForm("Новый товар",
+      adminSelect("Категория","category_id",categoryOptions)+
+      adminInput("Название","name","Например: Раф")+
+      adminInput("Описание","description","Краткое описание")+
+      adminInput("Цена","price","100","number")+
+      adminInput("Ссылка на фотографию","image_url","https://...")+
+      adminSelect("Тип товара","product_type",[
+        {value:"coffee",label:"Кофе"},
+        {value:"tea",label:"Чай"},
+        {value:"cold_drink",label:"Холодный напиток"},
+        {value:"food",label:"Еда"},
+        {value:"other",label:"Другое"}
+      ])+
+      adminInput("Порядок отображения","sort_order","0","number"),
+      "product.create","Добавить товар"
+    )+d.products.map(item=>{
+      const category=d.categories.find(c=>c.id===item.category_id);
+      return adminItem(item.name,`${item.price} ₽ · ${category?.name||"Без категории"}`,
+        "product.toggle",item.id,Boolean(item.active));
+    }).join("");
+  }
+
+  if(currentAdminTab==="groups"){
+    content.innerHTML=adminForm("Новая группа настроек",
+      adminInput("Название","name","Например: Молоко")+
+      adminSelect("Тип выбора","selection_type",[
+        {value:"single",label:"Один вариант"},
+        {value:"multiple",label:"Несколько вариантов"}
+      ])+
+      adminInput("Минимум выборов","min_select","0","number")+
+      adminInput("Максимум выборов","max_select","99","number")+
+      `<label class="check-row"><input type="checkbox" name="required"> Обязательный выбор</label>`+
+      adminInput("Порядок","sort_order","0","number"),
+      "group.create","Создать группу"
+    )+d.groups.map(item=>
+      adminItem(item.name,
+        `${item.selection_type==="single"?"Один вариант":"Несколько вариантов"} · максимум ${item.max_select}`,
+        "group.toggle",item.id,Boolean(item.active))
+    ).join("");
+  }
+
+  if(currentAdminTab==="modifiers"){
+    const groupOptions=d.groups.map(g=>({value:g.id,label:g.name}));
+    content.innerHTML=adminForm("Новая добавка",
+      adminSelect("Группа","group_id",groupOptions)+
+      adminInput("Название","name","Например: Ваниль")+
+      adminInput("Доплата","price_delta","15","number")+
+      adminInput("Порядок","sort_order","0","number"),
+      "modifier.create","Добавить вариант"
+    )+d.modifiers.map(item=>{
+      const group=d.groups.find(g=>g.id===item.group_id);
+      return adminItem(item.name,`${group?.name||"Группа"} · +${item.price_delta} ₽`,
+        "modifier.toggle",item.id,Boolean(item.active));
+    }).join("");
+  }
+
+  if(currentAdminTab==="links"){
+    const productOptions=d.products.map(p=>({value:p.id,label:p.name}));
+    const groupOptions=d.groups.map(g=>({value:g.id,label:g.name}));
+    content.innerHTML=adminForm("Привязать настройки к товару",
+      adminSelect("Товар","product_id",productOptions)+
+      adminSelect("Группа настроек","group_id",groupOptions)+
+      adminSelect("Действие","enabled",[
+        {value:"true",label:"Подключить"},
+        {value:"false",label:"Отключить"}
+      ]),
+      "link.set","Применить"
+    )+d.links.map(link=>{
+      const product=d.products.find(p=>p.id===link.product_id);
+      const group=d.groups.find(g=>g.id===link.group_id);
+      return adminItem(product?.name||"Товар",group?.name||"Группа",
+        "link.remove",link.product_id+"|"+link.group_id,true);
+    }).join("");
+  }
+
+  if(!content.innerHTML.trim())content.innerHTML='<div class="empty">Пока нет записей.</div>';
 }
 
-function adminForm(title,fields,action,buttonText="Сохранить") {
-  return `
-    <form class="admin-form" data-admin-action="${action}">
-      <h3>${title}</h3>
-      ${fields}
-      <button class="primary" type="submit">${buttonText}</button>
-    </form>
-  `;
-}
-
-function adminItem(title,subtitle,action,id,active=true) {
-  return `
-    <div class="admin-item">
-      <b>${escapeText(title)}</b><br>
-      <small>${escapeText(subtitle || "")}</small>
-      <div class="admin-actions">
-        <button data-toggle="${action}" data-id="${escapeText(id)}">
-          ${active ? "Скрыть" : "Включить"}
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-function renderAdmin() {
-  if (!adminData) return;
-
-  const d = adminData;
-  const content = $("adminContent");
-
-  if (currentAdminTab === "categories") {
-    content.innerHTML =
-      adminForm("Новая категория",
-        adminInput("Название","name","Например: Десерты") +
-        adminInput("Порядок отображения","sort_order","0","number"),
-        "category.create","Добавить категорию"
-      ) +
-      d.categories.map(item =>
-        adminItem(item.name,"Порядок: "+item.sort_order,"category.toggle",item.id,Boolean(item.active))
-      ).join("");
-  }
-
-  if (currentAdminTab === "products") {
-    const categoryOptions = d.categories.map(c => ({
-      value:c.id,label:c.name
-    }));
-
-    content.innerHTML =
-      adminForm("Новый товар",
-        adminSelect("Категория","category_id",categoryOptions) +
-        adminInput("Название","name","Например: Раф") +
-        adminInput("Описание","description","Краткое описание") +
-        adminInput("Цена","price","100","number") +
-        adminInput("Ссылка на фотографию","image_url","https://...") +
-        adminSelect("Тип товара","product_type",[
-          {value:"coffee",label:"Кофе"},
-          {value:"tea",label:"Чай"},
-          {value:"cold_drink",label:"Холодный напиток"},
-          {value:"food",label:"Еда"},
-          {value:"other",label:"Другое"}
-        ]) +
-        adminInput("Порядок отображения","sort_order","0","number"),
-        "product.create","Добавить товар"
-      ) +
-      d.products.map(item => {
-        const category = d.categories.find(c => c.id === item.category_id);
-        return adminItem(
-          item.name,
-          `${item.price} ₽ · ${category?.name || "Без категории"}`,
-          "product.toggle",item.id,Boolean(item.active)
-        );
-      }).join("");
-  }
-
-  if (currentAdminTab === "groups") {
-    content.innerHTML =
-      adminForm("Новая группа настроек",
-        adminInput("Название","name","Например: Молоко") +
-        adminSelect("Тип выбора","selection_type",[
-          {value:"single",label:"Один вариант"},
-          {value:"multiple",label:"Несколько вариантов"}
-        ]) +
-        adminInput("Минимум выборов","min_select","0","number") +
-        adminInput("Максимум выборов","max_select","99","number") +
-        `<label class="check-row"><input type="checkbox" name="required"> Обязательный выбор</label>` +
-        adminInput("Порядок","sort_order","0","number"),
-        "group.create","Создать группу"
-      ) +
-      d.groups.map(item =>
-        adminItem(
-          item.name,
-          `${item.selection_type === "single" ? "Один вариант" : "Несколько вариантов"} · максимум ${item.max_select}`,
-          "group.toggle",item.id,Boolean(item.active)
-        )
-      ).join("");
-  }
-
-  if (currentAdminTab === "modifiers") {
-    const groupOptions = d.groups.map(g => ({
-      value:g.id,label:g.name
-    }));
-
-    content.innerHTML =
-      adminForm("Новая добавка",
-        adminSelect("Группа","group_id",groupOptions) +
-        adminInput("Название","name","Например: Ваниль") +
-        adminInput("Доплата","price_delta","15","number") +
-        adminInput("Порядок","sort_order","0","number"),
-        "modifier.create","Добавить вариант"
-      ) +
-      d.modifiers.map(item => {
-        const group = d.groups.find(g => g.id === item.group_id);
-        return adminItem(
-          item.name,
-          `${group?.name || "Группа"} · +${item.price_delta} ₽`,
-          "modifier.toggle",item.id,Boolean(item.active)
-        );
-      }).join("");
-  }
-
-  if (currentAdminTab === "links") {
-    const productOptions = d.products.map(p => ({
-      value:p.id,label:p.name
-    }));
-
-    const groupOptions = d.groups.map(g => ({
-      value:g.id,label:g.name
-    }));
-
-    content.innerHTML =
-      adminForm("Привязать настройки к товару",
-        adminSelect("Товар","product_id",productOptions) +
-        adminSelect("Группа настроек","group_id",groupOptions) +
-        adminSelect("Действие","enabled",[
-          {value:"true",label:"Подключить"},
-          {value:"false",label:"Отключить"}
-        ]),
-        "link.set","Применить"
-      ) +
-      d.links.map(link => {
-        const product = d.products.find(p => p.id === link.product_id);
-        const group = d.groups.find(g => g.id === link.group_id);
-        return adminItem(
-          product?.name || "Товар",
-          group?.name || "Группа",
-          "link.remove",
-          link.product_id + "|" + link.group_id,
-          true
-        );
-      }).join("");
-  }
-
-  if (!content.innerHTML.trim()) {
-    content.innerHTML = '<div class="empty">Пока нет записей.</div>';
-  }
-}
-
-$("adminContent").addEventListener("submit", async event => {
-  const form = event.target.closest("[data-admin-action]");
-  if (!form) return;
-
+$("adminContent").addEventListener("submit",async event=>{
+  const form=event.target.closest("[data-admin-action]");
+  if(!form)return;
   event.preventDefault();
-
-  const action = form.dataset.adminAction;
-  const fd = new FormData(form);
-  const data = Object.fromEntries(fd.entries());
-
-  if (fd.has("required")) data.required = true;
-  else data.required = false;
-
-  if (data.enabled !== undefined) {
-    data.enabled = data.enabled === "true";
-  }
-
-  ["price","price_delta","sort_order","min_select","max_select"].forEach(key => {
-    if (data[key] !== undefined) data[key] = Number(data[key]);
+  const action=form.dataset.adminAction;
+  const fd=new FormData(form);
+  const data=Object.fromEntries(fd.entries());
+  data.required=fd.has("required");
+  if(data.enabled!==undefined)data.enabled=data.enabled==="true";
+  ["price","price_delta","sort_order","min_select","max_select"].forEach(key=>{
+    if(data[key]!==undefined)data[key]=Number(data[key]);
   });
-
-  try {
+  try{
     await api("api/admin",{action,data});
     showToast("Изменения сохранены");
     await loadAdmin();
     await loadMenu();
-  } catch (error) {
-    showToast(error.message);
-  }
+  }catch(error){showToast(error.message)}
 });
 
-$("adminContent").addEventListener("click", async event => {
-  const button = event.target.closest("[data-toggle]");
-  if (!button) return;
-
-  const action = button.dataset.toggle;
-  const id = button.dataset.id;
-
-  try {
-    if (action === "link.remove") {
-      const [product_id,group_id] = id.split("|");
-      await api("api/admin",{
-        action:"link.set",
-        data:{product_id,group_id,enabled:false}
-      });
-    } else {
-      await api("api/admin",{
-        action,
-        data:{id}
-      });
+$("adminContent").addEventListener("click",async event=>{
+  const button=event.target.closest("[data-toggle]");
+  if(!button)return;
+  const action=button.dataset.toggle,id=button.dataset.id;
+  try{
+    if(action==="link.remove"){
+      const [product_id,group_id]=id.split("|");
+      await api("api/admin",{action:"link.set",data:{product_id,group_id,enabled:false}});
+    }else{
+      await api("api/admin",{action,data:{id}});
     }
-
     showToast("Изменения сохранены");
     await loadAdmin();
     await loadMenu();
-  } catch (error) {
-    showToast(error.message);
-  }
+  }catch(error){showToast(error.message)}
 });
 
-// Запуск
-async function startApp() {
-  await Promise.all([
-    loadMenu(),
-    loadProfile()
-  ]);
+// ЗАПУСК
+async function startApp(){
+  await Promise.all([loadMenu(),loadProfile()]);
 }
-
 startApp();
 </script>
 </body>
