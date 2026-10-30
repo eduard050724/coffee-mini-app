@@ -3,293 +3,412 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Моя кофейня</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>#ЗБС КОФЕЙНЯ</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+:root{
+  --bg:#f5f1e9;
+  --card:#fffdf9;
+  --dark:#302b27;
+  --muted:#898078;
+  --gold:#b49a68;
+  --line:#e8e0d4;
+  --green:#596b50;
+  --danger:#a34e43;
+}
 *{box-sizing:border-box}
-[hidden]{display:none!important}
-
 body{
   margin:0;
-  background:#f7f3ed;
-  color:#30251f;
-  font-family:Arial,sans-serif
+  background:var(--bg);
+  color:var(--dark);
+  font-family:Arial,sans-serif;
+  padding-bottom:110px;
 }
-
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
 header{
-  padding:24px 20px;
-  background:#493328;
-  color:white;
-  border-radius:0 0 24px 24px;
-  position:relative
+  padding:27px 20px 20px;
+  text-align:center;
 }
-
-header small{color:#e8d2bd}
-h1{margin:8px 0;font-size:27px}
-.header-top{
+.brand{
+  font-size:27px;
+  font-weight:800;
+  letter-spacing:2px;
+}
+.slogan{
+  margin-top:8px;
+  color:var(--gold);
+  font-size:10px;
+  letter-spacing:2px;
+}
+.topline{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px
+  padding:0 18px 15px;
 }
-
-.profile-button{
-  border:1px solid #a88b78;
-  background:#654b3e;
-  color:white;
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:13px;
-  cursor:pointer;
-  white-space:nowrap
+.profile-button,.admin-button{
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:20px;
+  padding:9px 13px;
+  color:var(--dark);
+  font-size:12px;
 }
-
-main{padding:20px;max-width:650px;margin:auto}
-h2{font-size:20px}
-
-.panel{
-  background:white;
-  border-radius:16px;
-  padding:18px;
-  margin-bottom:16px
-}
-
-.panel p{line-height:1.5}
-
+.admin-button{display:none}
 .categories{
   display:flex;
   gap:8px;
-  overflow:auto
+  overflow-x:auto;
+  padding:5px 18px 16px;
+  scrollbar-width:none;
 }
-
-.categories button{
-  border:0;
-  border-radius:20px;
-  padding:11px 15px;
-  background:#e8dfd3;
+.categories::-webkit-scrollbar{display:none}
+.category{
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:22px;
+  padding:10px 16px;
   white-space:nowrap;
-  cursor:pointer
+  color:var(--dark);
+  font-size:13px;
 }
-
-.categories button.active{
-  background:#493328;
-  color:white
+.category.active{
+  background:var(--dark);
+  color:white;
+  border-color:var(--dark);
 }
-
+.section-title{
+  margin:8px 18px 15px;
+  font-size:18px;
+  font-weight:700;
+}
 .products{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:16px
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+  padding:0 14px;
 }
-
-.card{
-  background:white;
+.product{
+  background:var(--card);
+  border:1px solid var(--line);
   border-radius:16px;
-  padding:12px
+  overflow:hidden;
+  min-width:0;
 }
-
-.pic{
-  font-size:48px;
-  background:#f1e8dc;
-  border-radius:12px;
-  text-align:center;
-  padding:15px
-}
-
-.card h3{margin:12px 0 5px;font-size:16px}
-.price{font-weight:bold}
-
-.add{
-  width:100%;
-  margin-top:10px;
-  padding:11px;
-  border:0;
-  border-radius:10px;
-  background:#493328;
-  color:white;
-  cursor:pointer
-}
-
-.cart{
-  margin-top:22px;
-  background:white;
-  border-radius:16px;
-  padding:16px
-}
-
-.cart-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin:10px 0
-}
-
-.quantity button{
-  border:0;
-  border-radius:6px;
-  padding:6px 11px;
-  background:#e8dfd3;
-  cursor:pointer
-}
-
-.checkout{
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:12px;
-  background:#bd8054;
-  color:white;
-  font-weight:bold;
-  cursor:pointer
-}
-
-button:disabled{opacity:.6;cursor:wait}
-
-label{
-  display:block;
-  font-size:14px;
-  margin:12px 0 5px
-}
-
-input,textarea{
-  width:100%;
-  padding:12px;
-  border:1px solid #d8cbbd;
-  border-radius:9px;
-  font:inherit;
-  background:white
-}
-
-textarea{min-height:75px;resize:vertical}
-.muted{color:#786b61;font-size:13px}
-.status{
-  font-size:14px;
-  line-height:1.5;
-  margin-top:12px;
-  overflow-wrap:anywhere
-}
-.error{color:#a32e22}
-.success{color:#276738}
-
-/* Отдельные окна */
-.modal{
-  position:fixed;
-  inset:0;
-  z-index:1000;
-  background:rgba(25,17,13,.62);
+.product-image{
+  height:145px;
+  background:#e9e3d9;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:16px;
-  overflow-y:auto
+  overflow:hidden;
 }
-
-.modal-content{
+.product-image img{
   width:100%;
-  max-width:480px;
-  max-height:90vh;
-  overflow-y:auto;
-  background:#f7f3ed;
-  border-radius:22px;
-  padding:22px;
-  box-shadow:0 12px 40px rgba(0,0,0,.2);
-  animation:modalAppear .18s ease-out
+  height:100%;
+  object-fit:cover;
 }
-
-@keyframes modalAppear{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
+.no-image{font-size:38px;opacity:.4}
+.product-info{padding:12px}
+.product-name{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:6px;
 }
-
-.modal-header{
+.product-description{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+  min-height:29px;
+}
+.product-bottom{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:12px;
-  margin-bottom:12px
+  gap:5px;
+  margin-top:12px;
 }
-
-.modal-header h2{margin:0}
-
-.close-button{
+.price{font-size:15px;font-weight:700}
+.add-button{
+  background:var(--dark);
+  color:white;
   border:0;
-  background:#e8dfd3;
-  color:#493328;
-  width:36px;
-  height:36px;
+  border-radius:20px;
+  padding:9px 13px;
+  font-size:12px;
+}
+.empty{
+  padding:35px 20px;
+  text-align:center;
+  color:var(--muted);
+  grid-column:1/-1;
+}
+.bottom-cart{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:5;
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(245,241,233,.96);
+  border-top:1px solid var(--line);
+}
+.cart-button{
+  width:100%;
+  background:var(--dark);
+  color:white;
+  border:0;
+  border-radius:13px;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  font-weight:700;
+}
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  background:rgba(25,22,19,.55);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+}
+.overlay.show{display:flex}
+.modal{
+  width:100%;
+  max-width:560px;
+  max-height:92vh;
+  overflow-y:auto;
+  background:var(--bg);
+  border-radius:22px 22px 0 0;
+  padding:22px 18px calc(22px + env(safe-area-inset-bottom));
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+.modal-title{font-size:20px;font-weight:700}
+.close{
+  border:0;
+  background:#e9e2d8;
+  width:34px;
+  height:34px;
   border-radius:50%;
-  font-size:22px;
-  cursor:pointer;
-  flex-shrink:0
+  font-size:19px;
 }
-
-.modal-info{
-  background:white;
-  border-radius:14px;
-  padding:14px;
-  margin:14px 0
-}
-
-.modal-info p{margin:7px 0;line-height:1.5}
-
-.modal-actions{
+.field{
   display:flex;
   flex-direction:column;
-  gap:9px;
-  margin-top:18px
+  gap:7px;
+  margin-bottom:13px;
 }
-
-.secondary-button{
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field textarea,.field select{
   width:100%;
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:10px;
   padding:13px;
+  color:var(--dark);
+  outline:none;
+}
+.field textarea{min-height:75px;resize:vertical}
+.primary{
+  width:100%;
   border:0;
   border-radius:12px;
-  background:#e8dfd3;
-  color:#30251f;
-  font-weight:bold;
-  cursor:pointer
+  padding:15px;
+  background:var(--dark);
+  color:white;
+  font-weight:700;
 }
-
-.order-summary-row{
+.secondary{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  background:var(--card);
+  color:var(--dark);
+  margin-top:9px;
+}
+.group{
+  margin:18px 0;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--line);
+}
+.group-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:11px;
+}
+.group-note{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+.option{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 0;
+  font-size:13px;
+}
+.option label{
+  display:flex;
+  gap:9px;
+  align-items:center;
+  flex:1;
+}
+.option input{accent-color:var(--dark)}
+.option-price{color:var(--muted);white-space:nowrap}
+.modal-total{
   display:flex;
   justify-content:space-between;
-  gap:12px;
+  font-weight:700;
+  margin:18px 0;
+}
+.cart-line{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:13px;
+  margin-bottom:10px;
+}
+.cart-line-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-weight:700;
+}
+.cart-details{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.5;
+  margin-top:7px;
+}
+.cart-line-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+}
+.quantity{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+.quantity button{
+  width:29px;
+  height:29px;
+  border:0;
+  border-radius:50%;
+  background:#e9e2d8;
+}
+.remove{
+  color:var(--danger);
+  border:0;
+  background:none;
+  font-size:12px;
+}
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  padding:16px 0;
+  font-weight:700;
+  font-size:18px;
+}
+.notice{
+  padding:12px;
+  background:#eee8dd;
+  border-radius:10px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:13px;
+}
+.admin-tabs{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  margin-bottom:16px;
+}
+.admin-tab{
+  white-space:nowrap;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--card);
+  padding:9px 13px;
+  font-size:12px;
+}
+.admin-tab.active{
+  background:var(--dark);
+  color:white;
+}
+.admin-item{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:12px;
+  margin-bottom:9px;
+  font-size:13px;
+}
+.admin-item small{color:var(--muted)}
+.admin-actions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.admin-actions button{
+  border:1px solid var(--line);
+  background:#f2ede5;
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:11px;
+}
+.admin-form{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:14px;
+  margin-bottom:15px;
+}
+.admin-form h3{font-size:15px;margin:0 0 13px}
+.check-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
   margin:10px 0;
-  font-size:14px
 }
-
-.order-total{
-  border-top:1px solid #e8dfd3;
-  padding-top:13px;
-  margin-top:13px;
-  display:flex;
-  justify-content:space-between;
-  font-weight:bold;
-  font-size:18px
-}
-
-.success-icon{
-  font-size:58px;
+.toast{
+  position:fixed;
+  z-index:50;
+  bottom:95px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--dark);
+  color:white;
+  border-radius:20px;
+  padding:12px 18px;
+  font-size:12px;
+  display:none;
+  max-width:90%;
   text-align:center;
-  margin:12px 0
 }
-
-.success-title{
+.toast.show{display:block}
+.loading{
   text-align:center;
-  font-size:23px;
-  margin:10px 0
+  color:var(--muted);
+  padding:35px;
+  grid-column:1/-1;
 }
-
-@media(max-width:360px){
-  main{padding:14px}
-  .products{gap:8px}
-  .card{padding:9px}
-  header{padding:22px 15px}
-  .profile-button{padding:9px;font-size:12px}
+@media(min-width:600px){
+  .products{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px;margin:auto}
 }
 </style>
 </head>
@@ -297,682 +416,906 @@ textarea{min-height:75px;resize:vertical}
 <body>
 
 <header>
-  <div class="header-top">
-    <div>
-      <small>ВАША ЛЮБИМАЯ КОФЕЙНЯ</small>
-      <h1>Кофе с собой ☕</h1>
-    </div>
-
-    <button class="profile-button" onclick="openProfile()">
-      👤 Профиль
-    </button>
-  </div>
-
-  <div>Выбирай любимое — забирай свежим</div>
+  <div class="brand">#ЗБС КОФЕЙНЯ</div>
+  <div class="slogan">СНАЧАЛА КОФЕ, ПОТОМ ДЕЛА</div>
 </header>
 
-<main>
+<div class="topline">
+  <button class="profile-button" id="profileButton">👤 Профиль</button>
+  <button class="admin-button" id="adminButton">⚙ Администрирование</button>
+</div>
 
-  <section class="panel" id="loadingPanel">
-    <h2>Подождите...</h2>
-    <p id="loadingText">Проверяем ваши данные.</p>
-  </section>
+<div class="categories" id="categories">
+  <button class="category active" data-id="all">Все</button>
+</div>
 
-  <section class="panel" id="registrationPanel" hidden>
-    <h2>Регистрация</h2>
-    <p class="muted">
-      Заполни данные один раз. При следующих посещениях они будут загружаться автоматически.
-    </p>
+<div class="section-title">Наше меню</div>
+<div class="products" id="products">
+  <div class="loading">Загружаем меню...</div>
+</div>
 
-    <form id="registrationForm">
-      <label for="regName">Как тебя зовут? *</label>
-      <input id="regName" maxlength="100" autocomplete="name"
-        required minlength="2" placeholder="Введите имя">
+<div class="bottom-cart">
+  <button class="cart-button" id="openCart">
+    <span>🛍 Корзина <span id="cartCount">0</span></span>
+    <span id="cartTotal">0 ₽</span>
+  </button>
+</div>
 
-      <label for="regPhone">Номер телефона для связи с бариста *</label>
-      <input id="regPhone" type="tel" maxlength="40"
-        autocomplete="tel" required minlength="5"
-        placeholder="+373...">
-
-      <p class="muted">
-        Укажи номер, по которому бариста сможет связаться с тобой по заказу.
-      </p>
-
-      <button class="checkout" id="registerButton" type="submit">
-        Сохранить данные
-      </button>
-
-      <div class="status" id="registrationStatus"
-        role="status" aria-live="polite"></div>
-    </form>
-  </section>
-
-  <section class="panel" id="blockedPanel" hidden>
-    <h2>Не удалось открыть приложение</h2>
-    <p id="blockedText">Открой Mini App через Telegram-бота.</p>
-    <button class="checkout" onclick="checkProfile()">
-      Проверить ещё раз
-    </button>
-  </section>
-
-  <section id="shopPanel" hidden>
-
-    <h2>Меню</h2>
-
-    <div class="categories">
-      <button class="active" onclick="filter('Все',this)">Все</button>
-      <button onclick="filter('Кофе',this)">Кофе</button>
-      <button onclick="filter('Холодные напитки',this)">Холодные</button>
-      <button onclick="filter('Другое',this)">Другое</button>
+<div class="overlay" id="productOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="productModalTitle">Настройки товара</div>
+      <button class="close" data-close="productOverlay">×</button>
     </div>
-
-    <div class="products" id="products"></div>
-
-    <div class="cart">
-      <h2>Корзина</h2>
-
-      <div id="cart">Пока пусто</div>
-
-      <p id="total">Итого: 0 ₽</p>
-
-      <button class="checkout" id="openCheckout"
-        onclick="showCheckout()">
-        Оформить самовывоз
-      </button>
+    <div id="productModalContent"></div>
+    <div class="modal-total">
+      <span>Стоимость</span>
+      <span id="productModalTotal">0 ₽</span>
     </div>
-
-  </section>
-
-</main>
-
-<!-- Окно профиля -->
-<div class="modal" id="profileModal" hidden>
-  <div class="modal-content">
-
-    <div class="modal-header">
-      <h2>👤 Мой профиль</h2>
-      <button class="close-button" onclick="closeProfile()">×</button>
-    </div>
-
-    <p class="muted">
-      Здесь можно посмотреть или изменить данные, которые используются при оформлении предзаказа.
-    </p>
-
-    <form id="profileForm">
-
-      <label for="profileName">Ваше имя</label>
-      <input id="profileName" maxlength="100"
-        required minlength="2" autocomplete="name">
-
-      <label for="profilePhone">Номер телефона</label>
-      <input id="profilePhone" type="tel" maxlength="40"
-        required minlength="5" autocomplete="tel">
-
-      <div class="modal-actions">
-        <button class="checkout" id="saveProfileButton" type="submit">
-          Сохранить изменения
-        </button>
-
-        <button class="secondary-button" type="button"
-          onclick="closeProfile()">
-          Закрыть
-        </button>
-      </div>
-
-      <div class="status" id="profileStatus"
-        role="status" aria-live="polite"></div>
-
-    </form>
+    <button class="primary" id="addConfiguredProduct">Добавить в корзину</button>
   </div>
 </div>
 
-<!-- Окно подтверждения заказа -->
-<div class="modal" id="checkoutModal" hidden>
-  <div class="modal-content">
-
-    <div class="modal-header">
-      <h2>☕ Ваш предзаказ</h2>
-      <button class="close-button" onclick="hideCheckout()">×</button>
+<div class="overlay" id="cartOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Корзина</div>
+      <button class="close" data-close="cartOverlay">×</button>
     </div>
-
-    <p class="muted">
-      Проверь состав заказа перед отправкой бариста.
-    </p>
-
-    <div class="modal-info">
-      <p><b>Имя:</b> <span id="checkoutCustomer"></span></p>
-      <p><b>Телефон:</b> <span id="checkoutPhone"></span></p>
+    <div id="cartContent"></div>
+    <div class="total-row">
+      <span>Итого</span><span id="cartModalTotal">0 ₽</span>
     </div>
-
-    <div class="modal-info">
-      <h3 style="margin-top:0">Состав заказа</h3>
-      <div id="checkoutItems"></div>
-      <div class="order-total">
-        <span>Итого:</span>
-        <span id="checkoutTotal">0 ₽</span>
-      </div>
-    </div>
-
-    <form id="orderForm">
-
-      <label for="comment">Комментарий к заказу</label>
-      <textarea id="comment" maxlength="500"
-        placeholder="Например, без сахара"></textarea>
-
-      <p class="muted">
-        Оплата на месте. Заказ — самовывоз.
-      </p>
-
-      <div class="modal-actions">
-        <button class="checkout" id="submitOrder" type="submit">
-          Подтвердить заказ
-        </button>
-
-        <button type="button" class="secondary-button"
-          onclick="hideCheckout()">
-          Вернуться в меню
-        </button>
-      </div>
-
-      <div class="status" id="orderStatus"
-        role="status" aria-live="polite"></div>
-
-    </form>
+    <button class="primary" id="checkoutButton">Оформить предзаказ</button>
   </div>
 </div>
 
-<!-- Окно успешного заказа -->
-<div class="modal" id="successModal" hidden>
-  <div class="modal-content">
-
-    <div class="success-icon">✅</div>
-
-    <h2 class="success-title">Предзаказ отправлен!</h2>
-
-    <p style="text-align:center;line-height:1.6">
-      Ваш заказ успешно отправлен бариста.
-      Дождитесь сообщения в Telegram о принятии заказа.
-    </p>
-
-    <div class="modal-info">
-      <p><b>Заказ:</b> принят к отправке в кофейню.</p>
-      <p><b>Самовывоз:</b> оплата на месте.</p>
+<div class="overlay" id="profileOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Ваш профиль</div>
+      <button class="close" data-close="profileOverlay">×</button>
     </div>
-
-    <button class="checkout" onclick="closeSuccess()">
-      Вернуться в меню
-    </button>
-
+    <div class="notice" id="profileNotice">
+      Данные используются для связи с бариста.
+    </div>
+    <div class="field">
+      <label>Ваше имя</label>
+      <input id="profileName" maxlength="100" placeholder="Как к вам обращаться">
+    </div>
+    <div class="field">
+      <label>Номер телефона</label>
+      <input id="profilePhone" maxlength="40" placeholder="+373...">
+    </div>
+    <button class="primary" id="saveProfile">Сохранить профиль</button>
   </div>
 </div>
+
+<div class="overlay" id="checkoutOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Оформление заказа</div>
+      <button class="close" data-close="checkoutOverlay">×</button>
+    </div>
+    <div class="notice" id="checkoutCustomer"></div>
+    <div class="field">
+      <label>Комментарий к заказу (необязательно)</label>
+      <textarea id="orderComment" maxlength="500" placeholder="Например: без крышки, пожалуйста"></textarea>
+    </div>
+    <div class="total-row">
+      <span>К оплате</span><span id="checkoutTotal">0 ₽</span>
+    </div>
+    <button class="primary" id="sendOrder">Отправить предзаказ</button>
+  </div>
+</div>
+
+<div class="overlay" id="adminOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Панель управления</div>
+      <button class="close" data-close="adminOverlay">×</button>
+    </div>
+    <div class="notice">Управление меню кофейни #ЗБС. Изменения сохраняются в базе данных.</div>
+    <div class="admin-tabs" id="adminTabs">
+      <button class="admin-tab active" data-tab="products">Товары</button>
+      <button class="admin-tab" data-tab="categories">Категории</button>
+      <button class="admin-tab" data-tab="groups">Настройки</button>
+      <button class="admin-tab" data-tab="modifiers">Добавки</button>
+      <button class="admin-tab" data-tab="links">Привязки</button>
+    </div>
+    <div id="adminContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const API_URL = "https://coffee-orders-api.eduard-raikovski.workers.dev/";
 
 const tg = window.Telegram?.WebApp;
-
-const items = [
-  {name:"Эспрессо",category:"Кофе",price:50,emoji:"☕"},
-  {name:"Капучино",category:"Кофе",price:80,emoji:"🥛"},
-  {name:"Латте",category:"Кофе",price:90,emoji:"☕"},
-  {name:"Айс-кофе",category:"Холодные напитки",price:100,emoji:"🧋"},
-  {name:"Чай",category:"Другое",price:50,emoji:"🍵"},
-  {name:"Круассан",category:"Другое",price:65,emoji:"🥐"}
-];
-
-let basket = {};
-let current = "Все";
-let profile = null;
-let sending = false;
-let registering = false;
-let savingProfile = false;
-
-if(tg){
+if (tg) {
   tg.ready();
   tg.expand();
 }
 
-function getInitData(){
-  return tg?.initData || "";
+const initData = tg?.initData || "";
+
+let categories = [];
+let products = [];
+let selectedCategory = "all";
+let cart = [];
+let currentProduct = null;
+let currentAdminTab = "products";
+let adminData = null;
+let profile = {name:"",phone:""};
+let registered = false;
+
+const $ = id => document.getElementById(id);
+
+function showToast(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
 }
 
-async function apiRequest(path,body){
-  const response = await fetch(API_URL + path,{
+function openModal(id) {
+  $(id).classList.add("show");
+}
+
+function closeModal(id) {
+  $(id).classList.remove("show");
+}
+
+document.querySelectorAll("[data-close]").forEach(button => {
+  button.addEventListener("click", () => closeModal(button.dataset.close));
+});
+
+document.querySelectorAll(".overlay").forEach(overlay => {
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) closeModal(overlay.id);
+  });
+});
+
+async function api(path, body = {}) {
+  const response = await fetch(API_URL + path.replace(/^\//, ""), {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(body)
+    body:JSON.stringify({...body,initData})
   });
 
   let result;
-
-  try{
+  try {
     result = await response.json();
-  }catch{
-    throw new Error("Сервер вернул некорректный ответ.");
+  } catch {
+    throw new Error("Сервер вернул некорректный ответ");
   }
 
-  if(!response.ok){
-    throw new Error(result.error || "Ошибка сервера.");
+  if (!response.ok) {
+    throw new Error(result.error || "Ошибка запроса");
   }
 
   return result;
 }
 
-function showPanel(id){
-  ["loadingPanel","registrationPanel","blockedPanel","shopPanel"]
-    .forEach(panelId=>{
-      document.getElementById(panelId).hidden = panelId !== id;
-    });
-}
-
-function showBlocked(message){
-  document.getElementById("blockedText").textContent = message;
-  showPanel("blockedPanel");
-}
-
-async function checkProfile(){
-  showPanel("loadingPanel");
-
-  document.getElementById("loadingText").textContent =
-    "Проверяем ваши данные.";
-
-  const initData = getInitData();
-
-  if(!initData){
-    showBlocked(
-      "Приложение нужно открыть через Telegram-бота, нажав кнопку открытия меню."
-    );
+// Профиль
+async function loadProfile() {
+  if (!initData) {
+    $("profileNotice").textContent =
+      "Откройте приложение через Telegram, чтобы оформлять предзаказы.";
+    $("profileButton").textContent = "👤 Профиль";
     return;
   }
 
-  try{
-    const result = await apiRequest("api/profile",{initData});
+  try {
+    const result = await api("api/profile");
 
-    if(result.registered && result.name && result.phone){
-      profile = {
-        name:result.name,
-        phone:result.phone
-      };
-
-      openShop();
-      return;
-    }
-
-    if(result.error){
-      showBlocked(result.error);
-      return;
-    }
-
-    profile = null;
-
-    document.getElementById("regName").value = result.name || "";
-    document.getElementById("regPhone").value = result.phone || "";
-    document.getElementById("registrationStatus").textContent = "";
-
-    showPanel("registrationPanel");
-
-  }catch(error){
-    showBlocked(
-      error.message ||
-      "Не удалось проверить профиль. Попробуй открыть приложение ещё раз."
-    );
-  }
-}
-
-// Первичная регистрация
-document.getElementById("registrationForm")
-.addEventListener("submit",async event=>{
-  event.preventDefault();
-
-  if(registering) return;
-
-  const initData = getInitData();
-  const name = document.getElementById("regName").value.trim();
-  const phone = document.getElementById("regPhone").value.trim();
-
-  const status = document.getElementById("registrationStatus");
-  const button = document.getElementById("registerButton");
-
-  if(!initData){
-    status.className = "status error";
-    status.textContent = "Открой приложение через Telegram-бота.";
-    return;
-  }
-
-  if(name.length < 2 || phone.length < 5){
-    status.className = "status error";
-    status.textContent = "Проверь имя и номер телефона.";
-    return;
-  }
-
-  registering = true;
-  button.disabled = true;
-  button.textContent = "Сохраняем...";
-  status.className = "status";
-  status.textContent = "Сохраняем данные.";
-
-  try{
-    const result = await apiRequest("api/register",{
-      initData,
-      name,
-      phone
-    });
-
+    registered = Boolean(result.registered);
     profile = {
-      name:result.name || name,
-      phone:result.phone || phone
+      name:result.name || "",
+      phone:result.phone || ""
     };
 
-    document.getElementById("registrationForm").reset();
+    $("profileName").value = profile.name;
+    $("profilePhone").value = profile.phone;
 
-    openShop();
+    if (!registered) {
+      $("profileNotice").textContent =
+        "Сначала подтвердите Telegram-контакт через бота, затем заполните имя и телефон.";
+      openModal("profileOverlay");
+    } else {
+      $("profileNotice").textContent =
+        "Данные сохранены. Их можно изменить в любой момент.";
+    }
 
-  }catch(error){
-    status.className = "status error";
-    status.textContent = error.message ||
-      "Не удалось сохранить данные. Попробуй ещё раз.";
+    const user = tg?.initDataUnsafe?.user;
+    if (String(user?.id || "") === "931110633") {
+      $("adminButton").style.display = "block";
+    }
 
-  }finally{
-    registering = false;
-    button.disabled = false;
-    button.textContent = "Сохранить данные";
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
+$("profileButton").addEventListener("click", () => {
+  $("profileName").value = profile.name;
+  $("profilePhone").value = profile.phone;
+  openModal("profileOverlay");
+});
+
+$("saveProfile").addEventListener("click", async () => {
+  const name = $("profileName").value.trim();
+  const phone = $("profilePhone").value.trim();
+
+  if (name.length < 2 || phone.length < 5) {
+    showToast("Укажите имя и номер телефона");
+    return;
+  }
+
+  try {
+    const result = await api("api/register", {name,phone});
+    profile = {name:result.name,phone:result.phone};
+    registered = true;
+    closeModal("profileOverlay");
+    showToast("Профиль сохранён");
+  } catch (error) {
+    showToast(error.message);
   }
 });
 
-function openShop(){
-  showPanel("shopPanel");
-  renderProducts();
-  renderCart();
+// Загрузка меню
+async function loadMenu() {
+  $("products").innerHTML = '<div class="loading">Загружаем меню...</div>';
+
+  try {
+    const result = await api("api/menu");
+    categories = result.categories || [];
+    products = result.products || [];
+    renderCategories();
+    renderProducts();
+  } catch (error) {
+    $("products").innerHTML =
+      `<div class="empty">Не удалось загрузить меню.<br>${escapeText(error.message)}</div>`;
+  }
 }
 
-// Открытие профиля
-function openProfile(){
-  if(!profile) return;
-
-  document.getElementById("profileName").value = profile.name;
-  document.getElementById("profilePhone").value = profile.phone;
-  document.getElementById("profileStatus").textContent = "";
-
-  document.getElementById("profileModal").hidden = false;
+function escapeText(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
 }
 
-function closeProfile(){
-  if(savingProfile) return;
+function renderCategories() {
+  const container = $("categories");
+  container.innerHTML = "";
 
-  document.getElementById("profileModal").hidden = true;
+  const all = document.createElement("button");
+  all.className = "category" + (selectedCategory === "all" ? " active" : "");
+  all.textContent = "Все";
+  all.onclick = () => {
+    selectedCategory = "all";
+    renderCategories();
+    renderProducts();
+  };
+  container.appendChild(all);
+
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.className = "category" +
+      (selectedCategory === category.id ? " active" : "");
+    button.textContent = category.name;
+    button.onclick = () => {
+      selectedCategory = category.id;
+      renderCategories();
+      renderProducts();
+    };
+    container.appendChild(button);
+  });
 }
 
-// Сохранение изменений профиля
-document.getElementById("profileForm")
-.addEventListener("submit",async event=>{
-  event.preventDefault();
+function renderProducts() {
+  const container = $("products");
+  container.innerHTML = "";
 
-  if(savingProfile) return;
+  const visible = products.filter(product =>
+    selectedCategory === "all" || product.category_id === selectedCategory
+  );
 
-  const name = document.getElementById("profileName").value.trim();
-  const phone = document.getElementById("profilePhone").value.trim();
-  const status = document.getElementById("profileStatus");
-  const button = document.getElementById("saveProfileButton");
-
-  if(name.length < 2 || phone.length < 5){
-    status.className = "status error";
-    status.textContent = "Проверь имя и номер телефона.";
+  if (!visible.length) {
+    container.innerHTML = '<div class="empty">В этой категории пока нет товаров.</div>';
     return;
   }
 
-  savingProfile = true;
-  button.disabled = true;
-  button.textContent = "Сохраняем...";
-  status.className = "status";
-  status.textContent = "Обновляем профиль.";
+  visible.forEach(product => {
+    const card = document.createElement("article");
+    card.className = "product";
 
-  try{
-    const result = await apiRequest("api/register",{
-      initData:getInitData(),
-      name,
-      phone
+    const image = product.image_url
+      ? `<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" onerror="this.parentElement.innerHTML='<span class=no-image>☕</span>'">`
+      : '<span class="no-image">☕</span>';
+
+    card.innerHTML = `
+      <div class="product-image">${image}</div>
+      <div class="product-info">
+        <div class="product-name">${escapeText(product.name)}</div>
+        <div class="product-description">${escapeText(product.description || "")}</div>
+        <div class="product-bottom">
+          <span class="price">${Number(product.price)} ₽</span>
+          <button class="add-button">Выбрать</button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector(".add-button").onclick = () => openProduct(product);
+    container.appendChild(card);
+  });
+}
+
+// Настройка напитка
+function openProduct(product) {
+  currentProduct = product;
+
+  $("productModalTitle").textContent = product.name;
+  const content = $("productModalContent");
+  content.innerHTML = "";
+
+  const groups = product.groups || [];
+
+  if (!groups.length) {
+    content.innerHTML =
+      '<div class="notice">Для этого товара нет дополнительных настроек.</div>';
+  }
+
+  groups.forEach(group => {
+    const section = document.createElement("div");
+    section.className = "group";
+
+    const note = group.selection_type === "single"
+      ? "Можно выбрать один вариант"
+      : `Можно выбрать до ${group.max_select} вариантов`;
+
+    section.innerHTML = `
+      <div class="group-title">${escapeText(group.name)}</div>
+      <div class="group-note">${note}${group.required ? " · обязательно" : ""}</div>
+    `;
+
+    const inputType = group.selection_type === "single" ? "radio" : "checkbox";
+    const groupName = "group_" + group.id;
+
+    (group.modifiers || []).forEach(modifier => {
+      const row = document.createElement("div");
+      row.className = "option";
+
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = inputType;
+      input.name = groupName;
+      input.value = modifier.id;
+
+      const title = document.createElement("span");
+      title.textContent = modifier.name;
+
+      label.append(input,title);
+
+      const price = document.createElement("span");
+      price.className = "option-price";
+      price.textContent = Number(modifier.price_delta) > 0
+        ? `+${modifier.price_delta} ₽`
+        : "Бесплатно";
+
+      row.append(label,price);
+      section.appendChild(row);
+
+      input.addEventListener("change", updateProductTotal);
     });
 
-    profile = {
-      name:result.name || name,
-      phone:result.phone || phone
-    };
+    content.appendChild(section);
+  });
 
-    status.className = "status success";
-    status.textContent = "Данные успешно обновлены.";
+  updateProductTotal();
+  openModal("productOverlay");
+}
 
-  }catch(error){
-    status.className = "status error";
-    status.textContent = error.message ||
-      "Не удалось обновить профиль.";
+function getSelectedModifiers() {
+  if (!currentProduct) return [];
 
-  }finally{
-    savingProfile = false;
-    button.disabled = false;
-    button.textContent = "Сохранить изменения";
+  return [...$("productModalContent").querySelectorAll("input:checked")]
+    .map(input => {
+      const group = (currentProduct.groups || []).find(g =>
+        (g.modifiers || []).some(m => m.id === input.value)
+      );
+
+      const modifier = group?.modifiers.find(m => m.id === input.value);
+
+      return modifier ? {
+        id:modifier.id,
+        name:modifier.name,
+        price_delta:Number(modifier.price_delta)
+      } : null;
+    })
+    .filter(Boolean);
+}
+
+function updateProductTotal() {
+  if (!currentProduct) return;
+
+  const additions = getSelectedModifiers().reduce(
+    (sum,item) => sum + item.price_delta,0
+  );
+
+  $("productModalTotal").textContent =
+    (Number(currentProduct.price) + additions) + " ₽";
+}
+
+$("addConfiguredProduct").addEventListener("click", () => {
+  if (!currentProduct) return;
+
+  const selected = getSelectedModifiers();
+
+  for (const group of currentProduct.groups || []) {
+    const count = selected.filter(item =>
+      group.modifiers.some(modifier => modifier.id === item.id)
+    ).length;
+
+    const minimum = group.required
+      ? Math.max(1,Number(group.min_select))
+      : Number(group.min_select);
+
+    if (count < minimum || count > Number(group.max_select)) {
+      showToast(`Проверь выбор: ${group.name}`);
+      return;
+    }
   }
+
+  const key = currentProduct.id + "|" +
+    selected.map(item => item.id).sort().join(",");
+
+  const existing = cart.find(item => item.key === key);
+
+  if (existing) {
+    existing.quantity++;
+  } else {
+    const additions = selected.reduce(
+      (sum,item) => sum + item.price_delta,0
+    );
+
+    cart.push({
+      key,
+      productId:currentProduct.id,
+      name:currentProduct.name,
+      basePrice:Number(currentProduct.price),
+      modifiers:selected,
+      unitPrice:Number(currentProduct.price) + additions,
+      quantity:1
+    });
+  }
+
+  closeModal("productOverlay");
+  renderCartButton();
+  showToast("Добавлено в корзину");
 });
-
-// Категории меню
-function filter(category,button){
-  current = category;
-
-  document.querySelectorAll(".categories button")
-    .forEach(b=>b.classList.remove("active"));
-
-  button.classList.add("active");
-
-  renderProducts();
-}
-
-// Товары
-function renderProducts(){
-  document.getElementById("products").innerHTML =
-    items
-      .filter(x=>current==="Все"||x.category===current)
-      .map(x=>
-        `<div class="card">
-          <div class="pic">${x.emoji}</div>
-          <h3>${x.name}</h3>
-          <div class="price">${x.price} ₽</div>
-          <button class="add" onclick="add('${x.name}')">
-            Добавить +
-          </button>
-        </div>`
-      ).join("");
-}
 
 // Корзина
-function add(name){
-  basket[name] = (basket[name] || 0) + 1;
+function cartTotal() {
+  return cart.reduce((sum,item) => sum + item.unitPrice * item.quantity,0);
+}
+
+function cartCount() {
+  return cart.reduce((sum,item) => sum + item.quantity,0);
+}
+
+function renderCartButton() {
+  $("cartCount").textContent = cartCount();
+  $("cartTotal").textContent = cartTotal() + " ₽";
+}
+
+function renderCart() {
+  const container = $("cartContent");
+  container.innerHTML = "";
+
+  if (!cart.length) {
+    container.innerHTML = '<div class="empty">Корзина пока пуста.</div>';
+    $("cartModalTotal").textContent = "0 ₽";
+    $("checkoutButton").disabled = true;
+    return;
+  }
+
+  $("checkoutButton").disabled = false;
+
+  cart.forEach(item => {
+    const line = document.createElement("div");
+    line.className = "cart-line";
+
+    const details = item.modifiers.length
+      ? item.modifiers.map(modifier =>
+          `${escapeText(modifier.name)} (+${modifier.price_delta} ₽)`
+        ).join("<br>")
+      : "Без добавок";
+
+    line.innerHTML = `
+      <div class="cart-line-top">
+        <span>${escapeText(item.name)}</span>
+        <span>${item.unitPrice * item.quantity} ₽</span>
+      </div>
+      <div class="cart-details">${details}</div>
+      <div class="cart-line-bottom">
+        <div class="quantity">
+          <button data-action="minus">−</button>
+          <span>${item.quantity}</span>
+          <button data-action="plus">+</button>
+        </div>
+        <button class="remove">Удалить</button>
+      </div>
+    `;
+
+    line.querySelector('[data-action="minus"]').onclick = () => {
+      item.quantity--;
+      if (item.quantity <= 0) cart = cart.filter(x => x.key !== item.key);
+      renderCart();
+      renderCartButton();
+    };
+
+    line.querySelector('[data-action="plus"]').onclick = () => {
+      if (item.quantity >= 20) return showToast("Максимум 20 штук");
+      item.quantity++;
+      renderCart();
+      renderCartButton();
+    };
+
+    line.querySelector(".remove").onclick = () => {
+      cart = cart.filter(x => x.key !== item.key);
+      renderCart();
+      renderCartButton();
+    };
+
+    container.appendChild(line);
+  });
+
+  $("cartModalTotal").textContent = cartTotal() + " ₽";
+}
+
+$("openCart").addEventListener("click", () => {
   renderCart();
-}
+  openModal("cartOverlay");
+});
 
-function changeQuantity(name,delta){
-  basket[name] = (basket[name] || 0) + delta;
+// Оформление
+$("checkoutButton").addEventListener("click", async () => {
+  if (!cart.length) return;
 
-  if(basket[name] <= 0){
-    delete basket[name];
-  }
-
-  renderCart();
-}
-
-function getTotal(){
-  return items.reduce((sum,item)=>
-    sum + item.price * (basket[item.name] || 0),0);
-}
-
-function renderCart(){
-  const names = Object.keys(basket);
-  const cart = document.getElementById("cart");
-
-  if(!names.length){
-    cart.textContent = "Пока пусто";
-  }else{
-    cart.innerHTML = names.map(name=>{
-      const item = items.find(x=>x.name===name);
-
-      return `<div class="cart-row">
-        <span>
-          ${item.name} × ${basket[name]}<br>
-          <span class="muted">
-            ${item.price * basket[name]} ₽
-          </span>
-        </span>
-
-        <span class="quantity">
-          <button type="button"
-            aria-label="Уменьшить количество"
-            onclick="changeQuantity('${item.name}',-1)">−</button>
-
-          <button type="button"
-            aria-label="Увеличить количество"
-            onclick="changeQuantity('${item.name}',1)">+</button>
-        </span>
-      </div>`;
-    }).join("");
-  }
-
-  document.getElementById("total").textContent =
-    "Итого: " + getTotal() + " ₽";
-
-  if(!names.length){
-    hideCheckout();
-  }
-}
-
-// Открытие отдельного окна оформления
-function showCheckout(){
-  if(!Object.keys(basket).length){
-    alert("Сначала добавь товары в корзину.");
+  if (!initData) {
+    showToast("Откройте приложение через Telegram");
     return;
   }
 
-  if(!profile){
-    alert("Не найден профиль. Перезапусти приложение.");
+  if (!registered) {
+    closeModal("cartOverlay");
+    openModal("profileOverlay");
+    showToast("Сначала заполните профиль");
     return;
   }
 
-  document.getElementById("checkoutCustomer").textContent =
-    profile.name;
+  $("checkoutCustomer").textContent =
+    `${profile.name} · ${profile.phone}`;
 
-  document.getElementById("checkoutPhone").textContent =
-    profile.phone;
+  $("checkoutTotal").textContent = cartTotal() + " ₽";
+  closeModal("cartOverlay");
+  openModal("checkoutOverlay");
+});
 
-  const names = Object.keys(basket);
+$("sendOrder").addEventListener("click", async () => {
+  if (!cart.length) return;
 
-  document.getElementById("checkoutItems").innerHTML =
-    names.map(name=>{
-      const item = items.find(x=>x.name===name);
-
-      return `<div class="order-summary-row">
-        <span>${item.name} × ${basket[name]}</span>
-        <b>${item.price * basket[name]} ₽</b>
-      </div>`;
-    }).join("");
-
-  document.getElementById("checkoutTotal").textContent =
-    getTotal() + " ₽";
-
-  document.getElementById("orderStatus").textContent = "";
-
-  document.getElementById("checkoutModal").hidden = false;
-}
-
-function hideCheckout(){
-  if(sending) return;
-
-  document.getElementById("checkoutModal").hidden = true;
-}
-
-// Отправка заказа
-document.getElementById("orderForm")
-.addEventListener("submit",async event=>{
-  event.preventDefault();
-
-  if(sending) return;
-
-  const names = Object.keys(basket);
-
-  if(!names.length){
-    alert("Корзина пуста.");
-    return;
-  }
-
-  const initData = getInitData();
-
-  if(!initData){
-    hideCheckout();
-    showBlocked("Открой приложение через Telegram-бота.");
-    return;
-  }
-
-  const comment = document.getElementById("comment").value.trim();
-  const status = document.getElementById("orderStatus");
-  const button = document.getElementById("submitOrder");
-
-  sending = true;
+  const button = $("sendOrder");
   button.disabled = true;
-  button.textContent = "Отправляем заказ...";
+  button.textContent = "Отправляем...";
 
-  status.className = "status";
-  status.textContent = "Пожалуйста, подожди. Отправляем заказ бариста.";
-
-  try{
-    await apiRequest("api/orders",{
-      initData,
-      items:names.map(name=>({
-        name,
-        quantity:basket[name]
+  try {
+    const result = await api("api/orders", {
+      items:cart.map(item => ({
+        productId:item.productId,
+        quantity:item.quantity,
+        modifiers:item.modifiers.map(modifier => modifier.id)
       })),
-      comment
+      comment:$("orderComment").value.trim()
     });
 
-    basket = {};
+    cart = [];
+    $("orderComment").value = "";
+    renderCartButton();
+    closeModal("checkoutOverlay");
 
-    document.getElementById("orderForm").reset();
+    showToast("Предзаказ отправлен бариста!");
+    if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred("success");
 
-    document.getElementById("checkoutModal").hidden = true;
-
-    renderCart();
-
-    document.getElementById("successModal").hidden = false;
-
-  }catch(error){
-    status.className = "status error";
-
-    status.textContent =
-      error.message ||
-      "Не удалось отправить заказ. Товары остались в корзине.";
-
-  }finally{
-    sending = false;
+  } catch (error) {
+    showToast(error.message);
+  } finally {
     button.disabled = false;
-    button.textContent = "Подтвердить заказ";
+    button.textContent = "Отправить предзаказ";
   }
 });
 
-// Закрытие окна успешного заказа
-function closeSuccess(){
-  document.getElementById("successModal").hidden = true;
+// Админ-панель
+$("adminButton").addEventListener("click", async () => {
+  openModal("adminOverlay");
+  await loadAdmin();
+});
+
+async function loadAdmin() {
+  $("adminContent").innerHTML = '<div class="loading">Загружаем данные...</div>';
+
+  try {
+    adminData = await api("api/admin", {action:"list"});
+    renderAdmin();
+  } catch (error) {
+    $("adminContent").textContent = error.message;
+  }
 }
 
-// Закрытие окон по клавише Escape
-document.addEventListener("keydown",event=>{
-  if(event.key === "Escape"){
-    if(!document.getElementById("successModal").hidden){
-      closeSuccess();
-    }else if(!document.getElementById("checkoutModal").hidden){
-      hideCheckout();
-    }else if(!document.getElementById("profileModal").hidden){
-      closeProfile();
-    }
+$("adminTabs").addEventListener("click", event => {
+  const button = event.target.closest("[data-tab]");
+  if (!button) return;
+
+  currentAdminTab = button.dataset.tab;
+
+  document.querySelectorAll(".admin-tab").forEach(tab =>
+    tab.classList.toggle("active",tab === button)
+  );
+
+  renderAdmin();
+});
+
+function adminInput(label,name,placeholder="",type="text") {
+  return `
+    <div class="field">
+      <label>${label}</label>
+      <input name="${name}" type="${type}" placeholder="${placeholder}">
+    </div>
+  `;
+}
+
+function adminSelect(label,name,options) {
+  return `
+    <div class="field">
+      <label>${label}</label>
+      <select name="${name}">
+        ${options.map(option =>
+          `<option value="${escapeText(option.value)}">${escapeText(option.label)}</option>`
+        ).join("")}
+      </select>
+    </div>
+  `;
+}
+
+function adminForm(title,fields,action,buttonText="Сохранить") {
+  return `
+    <form class="admin-form" data-admin-action="${action}">
+      <h3>${title}</h3>
+      ${fields}
+      <button class="primary" type="submit">${buttonText}</button>
+    </form>
+  `;
+}
+
+function adminItem(title,subtitle,action,id,active=true) {
+  return `
+    <div class="admin-item">
+      <b>${escapeText(title)}</b><br>
+      <small>${escapeText(subtitle || "")}</small>
+      <div class="admin-actions">
+        <button data-toggle="${action}" data-id="${escapeText(id)}">
+          ${active ? "Скрыть" : "Включить"}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderAdmin() {
+  if (!adminData) return;
+
+  const d = adminData;
+  const content = $("adminContent");
+
+  if (currentAdminTab === "categories") {
+    content.innerHTML =
+      adminForm("Новая категория",
+        adminInput("Название","name","Например: Десерты") +
+        adminInput("Порядок отображения","sort_order","0","number"),
+        "category.create","Добавить категорию"
+      ) +
+      d.categories.map(item =>
+        adminItem(item.name,"Порядок: "+item.sort_order,"category.toggle",item.id,Boolean(item.active))
+      ).join("");
+  }
+
+  if (currentAdminTab === "products") {
+    const categoryOptions = d.categories.map(c => ({
+      value:c.id,label:c.name
+    }));
+
+    content.innerHTML =
+      adminForm("Новый товар",
+        adminSelect("Категория","category_id",categoryOptions) +
+        adminInput("Название","name","Например: Раф") +
+        adminInput("Описание","description","Краткое описание") +
+        adminInput("Цена","price","100","number") +
+        adminInput("Ссылка на фотографию","image_url","https://...") +
+        adminSelect("Тип товара","product_type",[
+          {value:"coffee",label:"Кофе"},
+          {value:"tea",label:"Чай"},
+          {value:"cold_drink",label:"Холодный напиток"},
+          {value:"food",label:"Еда"},
+          {value:"other",label:"Другое"}
+        ]) +
+        adminInput("Порядок отображения","sort_order","0","number"),
+        "product.create","Добавить товар"
+      ) +
+      d.products.map(item => {
+        const category = d.categories.find(c => c.id === item.category_id);
+        return adminItem(
+          item.name,
+          `${item.price} ₽ · ${category?.name || "Без категории"}`,
+          "product.toggle",item.id,Boolean(item.active)
+        );
+      }).join("");
+  }
+
+  if (currentAdminTab === "groups") {
+    content.innerHTML =
+      adminForm("Новая группа настроек",
+        adminInput("Название","name","Например: Молоко") +
+        adminSelect("Тип выбора","selection_type",[
+          {value:"single",label:"Один вариант"},
+          {value:"multiple",label:"Несколько вариантов"}
+        ]) +
+        adminInput("Минимум выборов","min_select","0","number") +
+        adminInput("Максимум выборов","max_select","99","number") +
+        `<label class="check-row"><input type="checkbox" name="required"> Обязательный выбор</label>` +
+        adminInput("Порядок","sort_order","0","number"),
+        "group.create","Создать группу"
+      ) +
+      d.groups.map(item =>
+        adminItem(
+          item.name,
+          `${item.selection_type === "single" ? "Один вариант" : "Несколько вариантов"} · максимум ${item.max_select}`,
+          "group.toggle",item.id,Boolean(item.active)
+        )
+      ).join("");
+  }
+
+  if (currentAdminTab === "modifiers") {
+    const groupOptions = d.groups.map(g => ({
+      value:g.id,label:g.name
+    }));
+
+    content.innerHTML =
+      adminForm("Новая добавка",
+        adminSelect("Группа","group_id",groupOptions) +
+        adminInput("Название","name","Например: Ваниль") +
+        adminInput("Доплата","price_delta","15","number") +
+        adminInput("Порядок","sort_order","0","number"),
+        "modifier.create","Добавить вариант"
+      ) +
+      d.modifiers.map(item => {
+        const group = d.groups.find(g => g.id === item.group_id);
+        return adminItem(
+          item.name,
+          `${group?.name || "Группа"} · +${item.price_delta} ₽`,
+          "modifier.toggle",item.id,Boolean(item.active)
+        );
+      }).join("");
+  }
+
+  if (currentAdminTab === "links") {
+    const productOptions = d.products.map(p => ({
+      value:p.id,label:p.name
+    }));
+
+    const groupOptions = d.groups.map(g => ({
+      value:g.id,label:g.name
+    }));
+
+    content.innerHTML =
+      adminForm("Привязать настройки к товару",
+        adminSelect("Товар","product_id",productOptions) +
+        adminSelect("Группа настроек","group_id",groupOptions) +
+        adminSelect("Действие","enabled",[
+          {value:"true",label:"Подключить"},
+          {value:"false",label:"Отключить"}
+        ]),
+        "link.set","Применить"
+      ) +
+      d.links.map(link => {
+        const product = d.products.find(p => p.id === link.product_id);
+        const group = d.groups.find(g => g.id === link.group_id);
+        return adminItem(
+          product?.name || "Товар",
+          group?.name || "Группа",
+          "link.remove",
+          link.product_id + "|" + link.group_id,
+          true
+        );
+      }).join("");
+  }
+
+  if (!content.innerHTML.trim()) {
+    content.innerHTML = '<div class="empty">Пока нет записей.</div>';
+  }
+}
+
+$("adminContent").addEventListener("submit", async event => {
+  const form = event.target.closest("[data-admin-action]");
+  if (!form) return;
+
+  event.preventDefault();
+
+  const action = form.dataset.adminAction;
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+
+  if (fd.has("required")) data.required = true;
+  else data.required = false;
+
+  if (data.enabled !== undefined) {
+    data.enabled = data.enabled === "true";
+  }
+
+  ["price","price_delta","sort_order","min_select","max_select"].forEach(key => {
+    if (data[key] !== undefined) data[key] = Number(data[key]);
+  });
+
+  try {
+    await api("api/admin",{action,data});
+    showToast("Изменения сохранены");
+    await loadAdmin();
+    await loadMenu();
+  } catch (error) {
+    showToast(error.message);
   }
 });
 
-checkProfile();
-</script>
+$("adminContent").addEventListener("click", async event => {
+  const button = event.target.closest("[data-toggle]");
+  if (!button) return;
 
+  const action = button.dataset.toggle;
+  const id = button.dataset.id;
+
+  try {
+    if (action === "link.remove") {
+      const [product_id,group_id] = id.split("|");
+      await api("api/admin",{
+        action:"link.set",
+        data:{product_id,group_id,enabled:false}
+      });
+    } else {
+      await api("api/admin",{
+        action,
+        data:{id}
+      });
+    }
+
+    showToast("Изменения сохранены");
+    await loadAdmin();
+    await loadMenu();
+  } catch (error) {
+    showToast(error.message);
+  }
+});
+
+// Запуск
+async function startApp() {
+  await Promise.all([
+    loadMenu(),
+    loadProfile()
+  ]);
+}
+
+startApp();
+</script>
 </body>
 </html>
