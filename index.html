@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>#ЗБС КОФЕЙНЯ</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
@@ -206,7 +207,35 @@ header{padding:27px 20px 20px;text-align:center}
 <script>
 const API_URL="https://coffee-orders-api.eduard-raikovski.workers.dev/";
 const tg=window.Telegram?.WebApp;
-if(tg){tg.ready();tg.expand()}
+
+// Настройка отображения Mini App
+if(tg){
+    tg.ready();
+    tg.expand();
+
+    // Отключаем сворачивание приложения свайпом вниз
+    try{
+        if(tg.isVersionAtLeast("7.7")){
+            tg.disableVerticalSwipes();
+        }
+    }catch(error){
+        console.warn("Не удалось отключить вертикальные свайпы:",error);
+    }
+
+    // Запрашиваем настоящий полноэкранный режим
+    try{
+        if(tg.isVersionAtLeast("8.0")){
+            tg.setHeaderColor("#f5f1e9");
+            tg.requestFullscreen();
+        }
+    }catch(error){
+        console.warn("Не удалось включить полноэкранный режим:",error);
+    }
+
+    tg.onEvent("fullscreenFailed",event=>{
+        console.warn("Ошибка полноэкранного режима:",event.error);
+    });
+}
 
 const initData=tg?.initData||"";
 let categories=[],products=[],selectedCategory="all",cart=[];
@@ -284,6 +313,7 @@ if(String(user?.id||"")==="931110633")$("adminButton").style.display="block";
 }catch(error){showToast(error.message)}
 }
 
+// Остальной код приложения оставлен без изменений
 $("profileButton").addEventListener("click",()=>{
 $("profileName").value=profile.name;
 $("profilePhone").value=profile.phone;
@@ -691,16 +721,6 @@ function adminForm(title,fields,action,buttonText="Сохранить"){
 return `<form class="admin-form" data-admin-action="${action}"><h3>${title}</h3>${fields}<button class="primary" type="submit">${buttonText}</button></form>`;
 }
 
-function adminItem(title,subtitle,action,id,active=true,editAttribute="",editLabel="Редактировать",deleteAttribute=""){
-return `<div class="admin-item">
-<b>${escapeText(title)}</b><br><small>${escapeText(subtitle||"")}</small>
-<div class="admin-actions">
-${editAttribute?`<button type="button" ${editAttribute}="${escapeText(id)}">${editLabel}</button>`:""}
-<button type="button" data-toggle="${action}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
-${deleteAttribute?`<button type="button" class="danger" ${deleteAttribute}="${escapeText(id)}">Удалить</button>`:""}
-</div></div>`;
-}
-
 function productTypeOptions(){
 return [
 {value:"coffee",label:"Кофе"},
@@ -966,7 +986,6 @@ renderAdmin();
 return;
 }
 
-// ИЗМЕНЕНИЕ ПОРЯДКА ПРИВЯЗКИ
 const editLink=event.target.closest("[data-edit-link]");
 if(editLink){
 const [product_id,group_id]=editLink.dataset.editLink.split("|");
@@ -992,7 +1011,6 @@ await loadMenu();
 return;
 }
 
-// УДАЛЕНИЕ ПРИВЯЗКИ
 const removeLink=event.target.closest("[data-remove-link]");
 if(removeLink){
 const [product_id,group_id]=removeLink.dataset.removeLink.split("|");
@@ -1010,7 +1028,6 @@ await loadMenu();
 return;
 }
 
-// УДАЛЕНИЕ КАТЕГОРИИ
 const deleteCategory=event.target.closest("[data-delete-category]");
 if(deleteCategory){
 const id=deleteCategory.dataset.deleteCategory;
@@ -1031,7 +1048,6 @@ showToast(error.message);
 return;
 }
 
-// УДАЛЕНИЕ ГРУППЫ
 const deleteGroup=event.target.closest("[data-delete-group]");
 if(deleteGroup){
 const id=deleteGroup.dataset.deleteGroup;
@@ -1059,7 +1075,6 @@ showToast(error.message);
 return;
 }
 
-// УДАЛЕНИЕ ДОБАВКИ
 const deleteModifier=event.target.closest("[data-delete-modifier]");
 if(deleteModifier){
 const id=deleteModifier.dataset.deleteModifier;
@@ -1080,7 +1095,6 @@ showToast(error.message);
 return;
 }
 
-// УДАЛЕНИЕ ТОВАРА
 const deleteButton=event.target.closest("[data-delete-product]");
 if(deleteButton){
 const id=deleteButton.dataset.deleteProduct;
@@ -1101,7 +1115,6 @@ showToast(error.message);
 return;
 }
 
-// УДАЛЕНИЕ РАЗМЕРА
 const deleteSizeButton=event.target.closest("[data-delete-size]");
 if(deleteSizeButton){
 const id=deleteSizeButton.dataset.deleteSize;
@@ -1122,7 +1135,6 @@ showToast(error.message);
 return;
 }
 
-// ВКЛЮЧЕНИЕ / ОТКЛЮЧЕНИЕ
 const button=event.target.closest("[data-toggle]");
 if(!button)return;
 
