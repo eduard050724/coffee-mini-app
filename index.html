@@ -68,12 +68,12 @@ header{padding:27px 20px 20px;text-align:center}
 .quantity button{width:29px;height:29px;border:0;border-radius:50%;background:#e9e2d8}
 .remove{color:var(--danger);border:0;background:none;font-size:12px}
 .total-row{display:flex;justify-content:space-between;padding:16px 0;font-weight:700;font-size:18px}
-.notice{padding:12px;background:#eee8dd;border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:13px}
+.notice{padding:12px;background:#eee8dd;border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:13px;line-height:1.5}
 .admin-tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:16px}
 .admin-tab{white-space:nowrap;border:1px solid var(--line);border-radius:18px;background:var(--card);padding:9px 13px;font-size:12px}
 .admin-tab.active{background:var(--dark);color:white}
 .admin-item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:9px;font-size:13px}
-.admin-item small{color:var(--muted)}
+.admin-item small{color:var(--muted);line-height:1.5}
 .admin-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .admin-actions button{border:1px solid var(--line);background:#f2ede5;border-radius:8px;padding:8px 10px;font-size:11px}
 .admin-form{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:15px}
@@ -209,7 +209,9 @@ if(tg){tg.ready();tg.expand()}
 
 const initData=tg?.initData||"";
 let categories=[],products=[],selectedCategory="all",cart=[];
-let currentProduct=null,currentAdminTab="products",adminData=null,editingProductId=null,editingSizeId=null;
+let currentProduct=null,currentAdminTab="products",adminData=null;
+let editingProductId=null,editingSizeId=null,editingCategoryId=null;
+let editingGroupId=null,editingModifierId=null;
 let profile={name:"",phone:""},registered=false;
 
 const $=id=>document.getElementById(id);
@@ -250,6 +252,12 @@ function escapeText(value){
 return String(value??"").replace(/[&<>"']/g,c=>({
 "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
 }[c]));
+}
+
+function asId(a,b){return String(a)===String(b)}
+function numberValue(value,defaultValue=0){
+const n=Number(value);
+return Number.isFinite(n)?n:defaultValue;
 }
 
 // ПРОФИЛЬ
@@ -321,7 +329,7 @@ all.onclick=()=>{selectedCategory="all";renderCategories();renderProducts()};
 container.appendChild(all);
 categories.forEach(category=>{
 const button=document.createElement("button");
-button.className="category"+(selectedCategory===category.id?" active":"");
+button.className="category"+(asId(selectedCategory,category.id)?" active":"");
 button.textContent=category.name;
 button.onclick=()=>{selectedCategory=category.id;renderCategories();renderProducts()};
 container.appendChild(button);
@@ -331,7 +339,7 @@ container.appendChild(button);
 function renderProducts(){
 const container=$("products");
 container.innerHTML="";
-const visible=products.filter(product=>selectedCategory==="all"||product.category_id===selectedCategory);
+const visible=products.filter(product=>selectedCategory==="all"||asId(product.category_id,selectedCategory));
 if(!visible.length){
 container.innerHTML='<div class="empty">В этой категории пока нет товаров.</div>';
 return;
@@ -340,7 +348,7 @@ visible.forEach(product=>{
 const card=document.createElement("div");
 card.className="product";
 const image=product.image_url
-?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}">`
+?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" loading="lazy">`
 :'<div class="no-image">☕</div>';
 const sizes=product.sizes||[];
 const priceText=sizes.length
@@ -435,7 +443,7 @@ function getSelectedSize(){
 if(!currentProduct)return null;
 const input=$("productModalContent").querySelector('input[name="productSize"]:checked');
 if(!input)return null;
-return (currentProduct.sizes||[]).find(size=>String(size.id)===String(input.value))||null;
+return (currentProduct.sizes||[]).find(size=>asId(size.id,input.value))||null;
 }
 
 function getSelectedModifiers(){
@@ -443,15 +451,15 @@ if(!currentProduct)return[];
 return [...$("productModalContent").querySelectorAll('input[type="checkbox"]:checked,input[type="radio"]:checked')]
 .filter(input=>input.name!=="productSize")
 .map(input=>{
-const group=(currentProduct.groups||[]).find(g=>(g.modifiers||[]).some(m=>String(m.id)===String(input.value)));
-const modifier=group?.modifiers.find(m=>String(m.id)===String(input.value));
-return modifier?{id:modifier.id,name:modifier.name,price_delta:Number(modifier.price_delta)}:null;
+const group=(currentProduct.groups||[]).find(g=>(g.modifiers||[]).some(m=>asId(m.id,input.value)));
+const modifier=group?.modifiers.find(m=>asId(m.id,input.value));
+return modifier?{id:modifier.id,name:modifier.name,price_delta:numberValue(modifier.price_delta)}:null;
 }).filter(Boolean);
 }
 
 function getCurrentBasePrice(){
 const size=getSelectedSize();
-return size?Number(size.price):Number(currentProduct?.price||0);
+return size?numberValue(size.price):numberValue(currentProduct?.price);
 }
 
 function updateProductTotal(){
@@ -469,14 +477,14 @@ return;
 }
 const selected=getSelectedModifiers();
 for(const group of currentProduct.groups||[]){
-const count=selected.filter(item=>group.modifiers.some(modifier=>String(modifier.id)===String(item.id))).length;
-const minimum=group.required?Math.max(1,Number(group.min_select)):Number(group.min_select);
-if(count<minimum||count>Number(group.max_select)){
+const count=selected.filter(item=>(group.modifiers||[]).some(modifier=>asId(modifier.id,item.id))).length;
+const minimum=group.required?Math.max(1,numberValue(group.min_select)):numberValue(group.min_select);
+if(count<minimum||count>numberValue(group.max_select)){
 showToast(`Проверь выбор: ${group.name}`);
 return;
 }
 }
-const basePrice=selectedSize?Number(selectedSize.price):Number(currentProduct.price);
+const basePrice=selectedSize?numberValue(selectedSize.price):numberValue(currentProduct.price);
 const additions=selected.reduce((sum,item)=>sum+item.price_delta,0);
 const unitPrice=basePrice+additions;
 const sizeKey=selectedSize?selectedSize.id:"no-size";
@@ -492,8 +500,8 @@ basePrice,
 size:selectedSize?{
 id:selectedSize.id,
 name:selectedSize.name,
-volume_ml:Number(selectedSize.volume_ml),
-price:Number(selectedSize.price)
+volume_ml:numberValue(selectedSize.volume_ml),
+price:numberValue(selectedSize.price)
 }:null,
 modifiers:selected,
 unitPrice,
@@ -650,7 +658,7 @@ $("adminContent").innerHTML='<div class="loading">Загружаем данны�
 try{
 adminData=await api("api/admin",{action:"list"});
 renderAdmin();
-}catch(error){$("adminContent").textContent=error.message}
+}catch(error){$("adminContent").innerHTML=`<div class="empty">${escapeText(error.message)}</div>`}
 }
 
 $("adminTabs").addEventListener("click",event=>{
@@ -661,192 +669,215 @@ document.querySelectorAll(".admin-tab").forEach(tab=>tab.classList.toggle("activ
 renderAdmin();
 });
 
-function adminInput(label,name,placeholder="",type="text"){
-return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" placeholder="${placeholder}"></div>`;
+function adminInput(label,name,placeholder="",type="text",value="",required=false){
+return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" placeholder="${escapeText(placeholder)}" value="${escapeText(value)}" ${required?"required":""}></div>`;
 }
 
-function adminSelect(label,name,options){
-return `<div class="field"><label>${label}</label><select name="${name}">${options.map(option=>`<option value="${escapeText(option.value)}">${escapeText(option.label)}</option>`).join("")}</select></div>`;
+function adminTextarea(label,name,value="",placeholder=""){
+return `<div class="field"><label>${label}</label><textarea name="${name}" placeholder="${escapeText(placeholder)}">${escapeText(value)}</textarea></div>`;
+}
+
+function adminSelect(label,name,options,selectedValue="",required=true){
+const opts=(options||[]).map(option=>
+`<option value="${escapeText(option.value)}"${asId(option.value,selectedValue)?" selected":""}>${escapeText(option.label)}</option>`
+).join("");
+return `<div class="field"><label>${label}</label><select name="${name}" ${required?"required":""}>${opts||'<option value="">Нет доступных вариантов</option>'}</select></div>`;
 }
 
 function adminForm(title,fields,action,buttonText="Сохранить"){
 return `<form class="admin-form" data-admin-action="${action}"><h3>${title}</h3>${fields}<button class="primary" type="submit">${buttonText}</button></form>`;
 }
 
-function adminItem(title,subtitle,action,id,active=true){
+function adminItem(title,subtitle,action,id,active=true,editAttribute="",editLabel="Редактировать"){
 return `<div class="admin-item">
 <b>${escapeText(title)}</b><br><small>${escapeText(subtitle||"")}</small>
 <div class="admin-actions">
+${editAttribute?`<button type="button" ${editAttribute}="${escapeText(id)}">${editLabel}</button>`:""}
 <button type="button" data-toggle="${action}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
 </div></div>`;
 }
 
-function adminProductItem(item,categoryName){
-return `<div class="admin-item">
-<b>${escapeText(item.name)}</b><br>
-<small>${Number(item.price)} ₽ · ${escapeText(categoryName||"Без категории")} · ${item.active?"Активен":"Скрыт"}</small>
-<div class="admin-actions">
-<button type="button" data-edit-product="${escapeText(item.id)}">Редактировать</button>
-<button type="button" data-toggle="product.toggle" data-id="${escapeText(item.id)}">${item.active?"Скрыть":"Включить"}</button>
-<button type="button" data-delete-product="${escapeText(item.id)}" style="color:var(--danger)">Удалить</button>
-</div></div>`;
-}
-
-function adminEditProductForm(item,categoryOptions){
-const categoryFields=categoryOptions.map(option=>`<option value="${escapeText(option.value)}"${String(option.value)===String(item.category_id)?" selected":""}>${escapeText(option.label)}</option>`).join("");
-const types=[
+function productTypeOptions(selected="food"){
+return [
 {value:"coffee",label:"Кофе"},
 {value:"tea",label:"Чай"},
 {value:"cold_drink",label:"Холодный напиток"},
 {value:"food",label:"Еда"},
 {value:"other",label:"Другое"}
 ];
-const typeFields=types.map(option=>`<option value="${option.value}"${option.value===item.product_type?" selected":""}>${option.label}</option>`).join("");
-return `<form class="admin-form" data-admin-action="product.update">
-<h3>Редактирование товара</h3>
-<input type="hidden" name="id" value="${escapeText(item.id)}">
-<div class="field"><label>Категория</label><select name="category_id" required>${categoryFields}</select></div>
-<div class="field"><label>Название</label><input name="name" value="${escapeText(item.name||"")}" maxlength="100" required></div>
-<div class="field"><label>Описание</label><textarea name="description" maxlength="500">${escapeText(item.description||"")}</textarea></div>
-<div class="field"><label>Цена</label><input name="price" type="number" min="0" step="1" value="${Number(item.price)||0}" required></div>
-<div class="field"><label>Ссылка на фотографию</label><input name="image_url" type="url" value="${escapeText(item.image_url||"")}" placeholder="https://..."></div>
-<div class="field"><label>Тип товара</label><select name="product_type" required>${typeFields}</select></div>
-<div class="field"><label>Порядок отображения</label><input name="sort_order" type="number" min="0" step="1" value="${Number(item.sort_order)||0}" required></div>
-<button class="primary" type="submit">Сохранить изменения</button>
-<button class="secondary" type="button" data-cancel-product-edit>Отмена</button>
+}
+
+function productForm(item=null){
+const editing=Boolean(item);
+const categoryOptions=(adminData.categories||[]).map(c=>({value:c.id,label:c.name}));
+const typeOptions=productTypeOptions();
+const fields=
+adminSelect("Категория","category_id",categoryOptions,item?.category_id||"")+
+adminInput("Название","name","Например: Раф","text",item?.name||"",true)+
+adminTextarea("Описание","description",item?.description||"","Краткое описание")+
+adminInput("Цена","price","100","number",item?.price??"",true)+
+adminInput("Ссылка на фотографию","image_url","https://...","url",item?.image_url||"")+
+adminSelect("Тип товара","product_type",typeOptions,item?.product_type||"food")+
+adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true);
+return `<form class="admin-form" data-admin-action="${editing?"product.update":"product.create"}">
+<h3>${editing?"Редактирование товара":"Новый товар"}</h3>
+${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+${fields}
+<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить товар"}</button>
+${editing?'<button class="secondary" type="button" data-cancel-edit="product">Отмена</button>':""}
 </form>`;
 }
 
-// ФОРМА РЕДАКТИРОВАНИЯ РАЗМЕРА
-function adminEditSizeForm(item,productOptions){
-const options=productOptions.map(option=>
-`<option value="${escapeText(option.value)}"${String(option.value)===String(item.product_id)?" selected":""}>${escapeText(option.label)}</option>`
-).join("");
-return `<form class="admin-form" data-admin-action="size.update">
-<h3>Редактирование размера</h3>
-<input type="hidden" name="id" value="${escapeText(item.id)}">
-<div class="field"><label>Товар</label><select name="product_id" required>${options}</select></div>
-<div class="field"><label>Название размера</label><input name="name" value="${escapeText(item.name)}" maxlength="80" required></div>
-<div class="field"><label>Объём (мл)</label><input name="volume_ml" type="number" min="1" max="5000" value="${Number(item.volume_ml)}" required></div>
-<div class="field"><label>Цена</label><input name="price" type="number" min="0" value="${Number(item.price)}" required></div>
-<div class="field"><label>Порядок отображения</label><input name="sort_order" type="number" min="0" value="${Number(item.sort_order)||0}" required></div>
-<button class="primary" type="submit">Сохранить изменения</button>
-<button class="secondary" type="button" data-cancel-size-edit>Отмена</button>
+function sizeForm(item=null){
+const editing=Boolean(item);
+const productOptions=(adminData.products||[]).map(p=>({value:p.id,label:p.name}));
+return `<form class="admin-form" data-admin-action="${editing?"size.update":"size.create"}">
+<h3>${editing?"Редактирование размера":"Добавить размер"}</h3>
+${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+${adminSelect("Товар","product_id",productOptions,item?.product_id||"")}
+${adminInput("Название размера","name","Например: Большой","text",item?.name||"",true)}
+${adminInput("Объём (мл)","volume_ml","400","number",item?.volume_ml??"",true)}
+${adminInput("Цена","price","100","number",item?.price??"",true)}
+${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
+<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить размер"}</button>
+${editing?'<button class="secondary" type="button" data-cancel-edit="size">Отмена</button>':""}
 </form>`;
 }
 
+function categoryForm(item=null){
+const editing=Boolean(item);
+return `<form class="admin-form" data-admin-action="${editing?"category.update":"category.create"}">
+<h3>${editing?"Редактирование категории":"Новая категория"}</h3>
+${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+${adminInput("Название","name","Например: Десерты","text",item?.name||"",true)}
+${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
+<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить категорию"}</button>
+${editing?'<button class="secondary" type="button" data-cancel-edit="category">Отмена</button>':""}
+</form>`;
+}
+
+function groupForm(item=null){
+const editing=Boolean(item);
+const typeOptions=[
+{value:"single",label:"Один вариант"},
+{value:"multiple",label:"Несколько вариантов"}
+];
+return `<form class="admin-form" data-admin-action="${editing?"group.update":"group.create"}">
+<h3>${editing?"Редактирование группы":"Новая группа настроек"}</h3>
+${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+${adminInput("Название","name","Например: Молоко","text",item?.name||"",true)}
+${adminSelect("Тип выбора","selection_type",typeOptions,item?.selection_type||"multiple")}
+${adminInput("Минимум выборов","min_select","0","number",item?.min_select??0,true)}
+${adminInput("Максимум выборов","max_select","99","number",item?.max_select??99,true)}
+<label class="check-row"><input type="checkbox" name="required" ${item?.required?"checked":""}> Обязательный выбор</label>
+${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
+<button class="primary" type="submit">${editing?"Сохранить изменения":"Создать группу"}</button>
+${editing?'<button class="secondary" type="button" data-cancel-edit="group">Отмена</button>':""}
+</form>`;
+}
+
+function modifierForm(item=null){
+const editing=Boolean(item);
+const groupOptions=(adminData.groups||[]).map(g=>({value:g.id,label:g.name}));
+return `<form class="admin-form" data-admin-action="${editing?"modifier.update":"modifier.create"}">
+<h3>${editing?"Редактирование добавки":"Новая добавка"}</h3>
+${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+${adminSelect("Группа","group_id",groupOptions,item?.group_id||"")}
+${adminInput("Название","name","Например: Ваниль","text",item?.name||"",true)}
+${adminInput("Доплата","price_delta","15","number",item?.price_delta??0,true)}
+${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
+<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить вариант"}</button>
+${editing?'<button class="secondary" type="button" data-cancel-edit="modifier">Отмена</button>':""}
+</form>`;
+}
+
+// РЕНДЕР АДМИНКИ
 function renderAdmin(){
 if(!adminData)return;
 const d=adminData,content=$("adminContent");
+content.innerHTML="";
 
 if(currentAdminTab==="categories"){
-content.innerHTML=adminForm("Новая категория",
-adminInput("Название","name","Например: Десерты")+
-adminInput("Порядок отображения","sort_order","0","number"),
-"category.create","Добавить категорию"
-)+d.categories.map(item=>adminItem(item.name,"Порядок: "+item.sort_order,"category.toggle",item.id,Boolean(item.active))).join("");
+const editing=(d.categories||[]).find(item=>asId(item.id,editingCategoryId));
+content.innerHTML=categoryForm(editing)+
+(d.categories||[]).map(item=>{
+const isActive=Boolean(Number(item.active));
+return adminItem(item.name,`Порядок: ${item.sort_order} · ${isActive?"Активна":"Скрыта"}`,"category.toggle",item.id,isActive,"data-edit-category");
+}).join("");
 }
 
 if(currentAdminTab==="products"){
-const categoryOptions=d.categories.map(c=>({value:c.id,label:c.name}));
-const editingProduct=d.products.find(item=>item.id===editingProductId);
-const createForm=adminForm("Новый товар",
-adminSelect("Категория","category_id",categoryOptions)+
-adminInput("Название","name","Например: Раф")+
-adminInput("Описание","description","Краткое описание")+
-adminInput("Цена","price","100","number")+
-adminInput("Ссылка на фотографию","image_url","https://...")+
-adminSelect("Тип товара","product_type",[
-{value:"coffee",label:"Кофе"},
-{value:"tea",label:"Чай"},
-{value:"cold_drink",label:"Холодный напиток"},
-{value:"food",label:"Еда"},
-{value:"other",label:"Другое"}
-])+
-adminInput("Порядок отображения","sort_order","0","number"),
-"product.create","Добавить товар"
-);
-content.innerHTML=createForm+
-(editingProduct?adminEditProductForm(editingProduct,categoryOptions):"")+
-d.products.map(item=>{
-const category=d.categories.find(c=>c.id===item.category_id);
-return adminProductItem(item,category?.name);
+const editing=(d.products||[]).find(item=>asId(item.id,editingProductId));
+content.innerHTML=productForm()+
+(editing?productForm(editing):"")+
+(d.products||[]).map(item=>{
+const category=d.categories.find(c=>asId(c.id,item.category_id));
+return `<div class="admin-item">
+<b>${escapeText(item.name)}</b><br>
+<small>${Number(item.price)} ₽ · ${escapeText(category?.name||"Без категории")} · ${Number(item.active)?"Активен":"Скрыт"}</small>
+<div class="admin-actions">
+<button type="button" data-edit-product="${escapeText(item.id)}">Редактировать</button>
+<button type="button" data-toggle="product.toggle" data-id="${escapeText(item.id)}">${Number(item.active)?"Скрыть":"Включить"}</button>
+<button type="button" data-delete-product="${escapeText(item.id)}" style="color:var(--danger)">Удалить</button>
+</div></div>`;
 }).join("");
 }
 
 if(currentAdminTab==="groups"){
-content.innerHTML=adminForm("Новая группа настроек",
-adminInput("Название","name","Например: Молоко")+
-adminSelect("Тип выбора","selection_type",[
-{value:"single",label:"Один вариант"},
-{value:"multiple",label:"Несколько вариантов"}
-])+
-adminInput("Минимум выборов","min_select","0","number")+
-adminInput("Максимум выборов","max_select","99","number")+
-`<label class="check-row"><input type="checkbox" name="required"> Обязательный выбор</label>`+
-adminInput("Порядок","sort_order","0","number"),
-"group.create","Создать группу"
-)+d.groups.map(item=>adminItem(item.name,
-`${item.selection_type==="single"?"Один вариант":"Несколько вариантов"} · максимум ${item.max_select}`,
-"group.toggle",item.id,Boolean(item.active))).join("");
+const editing=(d.groups||[]).find(item=>asId(item.id,editingGroupId));
+content.innerHTML=groupForm(editing||null)+
+(d.groups||[]).map(item=>{
+const active=Boolean(Number(item.active));
+return adminItem(item.name,`${item.selection_type==="single"?"Один вариант":"Несколько вариантов"} · минимум ${item.min_select} · максимум ${item.max_select} · ${active?"Активна":"Отключена"}`,"group.toggle",item.id,active,"data-edit-group");
+}).join("");
 }
 
 if(currentAdminTab==="modifiers"){
-const groupOptions=d.groups.map(g=>({value:g.id,label:g.name}));
-content.innerHTML=adminForm("Новая добавка",
-adminSelect("Группа","group_id",groupOptions)+
-adminInput("Название","name","Например: Ваниль")+
-adminInput("Доплата","price_delta","15","number")+
-adminInput("Порядок","sort_order","0","number"),
-"modifier.create","Добавить вариант"
-)+d.modifiers.map(item=>{
-const group=d.groups.find(g=>g.id===item.group_id);
-return adminItem(item.name,`${group?.name||"Группа"} · +${item.price_delta} ₽`,"modifier.toggle",item.id,Boolean(item.active));
+const editing=(d.modifiers||[]).find(item=>asId(item.id,editingModifierId));
+content.innerHTML=modifierForm(editing||null)+
+(d.modifiers||[]).map(item=>{
+const group=d.groups.find(g=>asId(g.id,item.group_id));
+const active=Boolean(Number(item.active));
+return adminItem(item.name,`${group?.name||"Без группы"} · ${Number(item.price_delta)>0?"+":""}${item.price_delta} ₽ · ${active?"Активна":"Отключена"}`,"modifier.toggle",item.id,active,"data-edit-modifier");
 }).join("");
 }
 
 if(currentAdminTab==="links"){
 const productOptions=d.products.map(p=>({value:p.id,label:p.name}));
 const groupOptions=d.groups.map(g=>({value:g.id,label:g.name}));
-content.innerHTML=adminForm("Привязать настройки к товару",
+content.innerHTML=adminForm("Привязать группу настроек к товару",
 adminSelect("Товар","product_id",productOptions)+
 adminSelect("Группа настроек","group_id",groupOptions)+
-adminSelect("Действие","enabled",[
-{value:"true",label:"Подключить"},
-{value:"false",label:"Отключить"}
-]),
-"link.set","Применить"
+adminInput("Порядок отображения","sort_order","0","number",0),
+"link.set","Сохранить привязку"
 )+d.links.map(link=>{
-const product=d.products.find(p=>p.id===link.product_id);
-const group=d.groups.find(g=>g.id===link.group_id);
-return adminItem(product?.name||"Товар",group?.name||"Группа","link.remove",link.product_id+"|"+link.group_id,true);
+const product=d.products.find(p=>asId(p.id,link.product_id));
+const group=d.groups.find(g=>asId(g.id,link.group_id));
+return `<div class="admin-item">
+<b>${escapeText(product?.name||"Товар")}</b><br>
+<small>Группа: ${escapeText(group?.name||"Группа")} · Порядок: ${link.sort_order}</small>
+<div class="admin-actions">
+<button type="button" data-edit-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}" data-sort="${Number(link.sort_order)||0}">Изменить порядок</button>
+<button type="button" data-remove-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}" style="color:var(--danger)">Отвязать</button>
+</div></div>`;
 }).join("");
 }
 
-// НОВАЯ ВКЛАДКА РАЗМЕРОВ
 if(currentAdminTab==="sizes"){
-const productOptions=d.products.map(p=>({value:p.id,label:p.name}));
-const editingSize=d.sizes.find(item=>String(item.id)===String(editingSizeId));
-const createForm=adminForm("Добавить размер",
-adminSelect("Товар","product_id",productOptions)+
-adminInput("Название размера","name","Например: Большой")+
-adminInput("Объём (мл)","volume_ml","400","number")+
-adminInput("Цена","price","100","number")+
-adminInput("Порядок отображения","sort_order","0","number"),
-"size.create","Добавить размер"
-);
-const editForm=editingSize?adminEditSizeForm(editingSize,productOptions):"";
-const sizeItems=d.sizes.map(item=>`
-<div class="admin-item">
+const editing=(d.sizes||[]).find(item=>asId(item.id,editingSizeId));
+content.innerHTML=sizeForm()+
+(editing?sizeForm(editing):"")+
+(d.sizes||[]).map(item=>{
+const active=Boolean(Number(item.active));
+return `<div class="admin-item">
 <b>${escapeText(item.product_name||"Товар")} — ${escapeText(item.name)}</b><br>
-<small>${Number(item.volume_ml)} мл · ${Number(item.price)} ₽ · ${item.active?"Активен":"Отключён"}</small>
+<small>${Number(item.volume_ml)} мл · ${Number(item.price)} ₽ · ${active?"Активен":"Отключён"}</small>
 <div class="admin-actions">
 <button type="button" data-edit-size="${escapeText(item.id)}">Редактировать</button>
-<button type="button" data-toggle="product_sizes.toggle" data-id="${escapeText(item.id)}">${item.active?"Отключить":"Включить"}</button>
+<button type="button" data-toggle="size.toggle" data-id="${escapeText(item.id)}">${active?"Отключить":"Включить"}</button>
 <button type="button" data-delete-size="${escapeText(item.id)}" style="color:var(--danger)">Удалить</button>
-</div>
-</div>`).join("");
-content.innerHTML=createForm+editForm+(sizeItems||'<div class="empty">Размеры ещё не созданы. Добавь первый размер выше.</div>');
+</div></div>`;
+}).join("");
 }
 
 if(!content.innerHTML.trim())content.innerHTML='<div class="empty">Пока нет записей.</div>';
@@ -865,41 +896,98 @@ if(data.enabled!==undefined)data.enabled=data.enabled==="true";
 ["price","price_delta","sort_order","min_select","max_select","volume_ml"].forEach(key=>{
 if(data[key]!==undefined)data[key]=Number(data[key]);
 });
+const submit=form.querySelector('button[type="submit"]');
+if(submit){submit.disabled=true;submit.textContent="Сохраняем..."}
 try{
 await api("api/admin",{action,data});
 if(action==="product.update")editingProductId=null;
 if(action==="size.update")editingSizeId=null;
+if(action==="category.update")editingCategoryId=null;
+if(action==="group.update")editingGroupId=null;
+if(action==="modifier.update")editingModifierId=null;
 showToast("Изменения сохранены");
 await loadAdmin();
 await loadMenu();
-}catch(error){showToast(error.message)}
+}catch(error){
+showToast(error.message);
+if(submit){submit.disabled=false;submit.textContent="Повторить сохранение"}
+}
 });
 
 // КНОПКИ АДМИНКИ
 $("adminContent").addEventListener("click",async event=>{
-const editButton=event.target.closest("[data-edit-product]");
-if(editButton){editingProductId=editButton.dataset.editProduct;renderAdmin();return}
+const editProduct=event.target.closest("[data-edit-product]");
+if(editProduct){editingProductId=editProduct.dataset.editProduct;renderAdmin();return}
 
-const cancelButton=event.target.closest("[data-cancel-product-edit]");
-if(cancelButton){editingProductId=null;renderAdmin();return}
+const editSize=event.target.closest("[data-edit-size]");
+if(editSize){editingSizeId=editSize.dataset.editSize;renderAdmin();return}
 
-const sizeEditButton=event.target.closest("[data-edit-size]");
-if(sizeEditButton){editingSizeId=sizeEditButton.dataset.editSize;renderAdmin();return}
+const editCategory=event.target.closest("[data-edit-category]");
+if(editCategory){editingCategoryId=editCategory.dataset.editCategory;renderAdmin();return}
 
-const sizeCancelButton=event.target.closest("[data-cancel-size-edit]");
-if(sizeCancelButton){editingSizeId=null;renderAdmin();return}
+const editGroup=event.target.closest("[data-edit-group]");
+if(editGroup){editingGroupId=editGroup.dataset.editGroup;renderAdmin();return}
+
+const editModifier=event.target.closest("[data-edit-modifier]");
+if(editModifier){editingModifierId=editModifier.dataset.editModifier;renderAdmin();return}
+
+const cancel=event.target.closest("[data-cancel-edit]");
+if(cancel){
+const type=cancel.dataset.cancelEdit;
+if(type==="product")editingProductId=null;
+if(type==="size")editingSizeId=null;
+if(type==="category")editingCategoryId=null;
+if(type==="group")editingGroupId=null;
+if(type==="modifier")editingModifierId=null;
+renderAdmin();
+return;
+}
+
+const editLink=event.target.closest("[data-edit-link]");
+if(editLink){
+const [product_id,group_id]=editLink.dataset.editLink.split("|");
+const currentSort=Number(editLink.dataset.sort)||0;
+const value=prompt("Новый порядок отображения группы:",String(currentSort));
+if(value===null)return;
+const sort_order=Number(value);
+if(!Number.isSafeInteger(sort_order)||sort_order<0){
+showToast("Укажите целое число от 0");
+return;
+}
+try{
+await api("api/admin",{action:"link.set",data:{product_id,group_id,enabled:true,sort_order}});
+showToast("Порядок привязки изменён");
+await loadAdmin();
+await loadMenu();
+}catch(error){showToast(error.message)}
+return;
+}
+
+const removeLink=event.target.closest("[data-remove-link]");
+if(removeLink){
+const [product_id,group_id]=removeLink.dataset.removeLink.split("|");
+if(!confirm("Отвязать эту группу настроек от товара?"))return;
+try{
+await api("api/admin",{action:"link.set",data:{product_id,group_id,enabled:false}});
+showToast("Группа отвязана");
+await loadAdmin();
+await loadMenu();
+}catch(error){showToast(error.message)}
+return;
+}
 
 const deleteButton=event.target.closest("[data-delete-product]");
 if(deleteButton){
 const id=deleteButton.dataset.deleteProduct;
-const product=adminData?.products?.find(item=>String(item.id)===String(id));
-if(!confirm(`Удалить товар «${product?.name||"без названия"}»? Это действие нельзя отменить.`))return;
+const product=adminData?.products?.find(item=>asId(item.id,id));
+if(!confirm(`Удалить товар «${product?.name||"без названия"}»?`))return;
 deleteButton.disabled=true;
 try{
 await api("api/admin",{action:"product.delete",data:{id}});
-if(editingProductId===id)editingProductId=null;
+if(asId(editingProductId,id))editingProductId=null;
 showToast("Товар удалён");
-await loadAdmin();await loadMenu();
+await loadAdmin();
+await loadMenu();
 }catch(error){deleteButton.disabled=false;showToast(error.message)}
 return;
 }
@@ -907,14 +995,15 @@ return;
 const deleteSizeButton=event.target.closest("[data-delete-size]");
 if(deleteSizeButton){
 const id=deleteSizeButton.dataset.deleteSize;
-const size=adminData?.sizes?.find(item=>String(item.id)===String(id));
+const size=adminData?.sizes?.find(item=>asId(item.id,id));
 if(!confirm(`Удалить размер «${size?.name||""}»?`))return;
 deleteSizeButton.disabled=true;
 try{
 await api("api/admin",{action:"size.delete",data:{id}});
-if(editingSizeId===id)editingSizeId=null;
+if(asId(editingSizeId,id))editingSizeId=null;
 showToast("Размер удалён");
-await loadAdmin();await loadMenu();
+await loadAdmin();
+await loadMenu();
 }catch(error){deleteSizeButton.disabled=false;showToast(error.message)}
 return;
 }
@@ -922,23 +1011,21 @@ return;
 const button=event.target.closest("[data-toggle]");
 if(!button)return;
 const action=button.dataset.toggle,id=button.dataset.id;
+button.disabled=true;
 try{
-if(action==="link.remove"){
-const [product_id,group_id]=id.split("|");
-await api("api/admin",{action:"link.set",data:{product_id,group_id,enabled:false}});
-}else if(action==="product_sizes.toggle"){
-await api("api/admin",{action:"size.toggle",data:{id}});
-}else{
 await api("api/admin",{action,data:{id}});
-}
 showToast("Изменения сохранены");
 await loadAdmin();
 await loadMenu();
-}catch(error){showToast(error.message)}
+}catch(error){
+button.disabled=false;
+showToast(error.message);
+}
 });
 
 // ЗАПУСК
 async function startApp(){
+renderCartButton();
 await Promise.all([loadMenu(),loadProfile()]);
 }
 startApp();
