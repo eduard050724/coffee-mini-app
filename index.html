@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,100 +5,590 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>#ЗБС КОФЕЙНЯ</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 :root{
 --bg:#f5f1e9;--card:#fffdf9;--dark:#302b27;--muted:#898078;
 --gold:#b49a68;--line:#e8e0d4;--green:#596b50;--danger:#a34e43
 }
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif;padding-bottom:110px}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--dark);
+font-family:Arial,sans-serif;
+padding-bottom:110px;
+}
+
+/* ЗАСТАВКА ЗАГРУЗКИ */
+#splashScreen{
+position:fixed;
+inset:0;
+z-index:9999;
+background:#fffdf9;
+display:flex;
+align-items:center;
+justify-content:center;
+opacity:1;
+visibility:visible;
+transition:opacity .45s ease,visibility .45s ease;
+}
+
+#splashScreen img{
+display:block;
+width:min(88vw,430px);
+max-height:65vh;
+object-fit:contain;
+}
+
+#splashScreen.hide{
+opacity:0;
+visibility:hidden;
+pointer-events:none;
+}
+
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
-header{padding:27px 20px 20px;text-align:center}
-.brand{font-size:27px;font-weight:800;letter-spacing:2px}
-.slogan{margin-top:8px;color:var(--gold);font-size:10px;letter-spacing:2px}
-.topline{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:0 18px 15px}
-.profile-button,.admin-button{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:9px 13px;color:var(--dark);font-size:12px}
+
+/* ШАПКА С УЧЁТОМ БЕЗОПАСНОЙ ЗОНЫ TELEGRAM */
+header{
+padding:
+calc(27px + max(env(safe-area-inset-top),var(--tg-content-safe-area-inset-top,0px)))
+20px 20px;
+text-align:center;
+}
+
+.brand{
+font-size:27px;
+font-weight:800;
+letter-spacing:2px;
+}
+
+.slogan{
+margin-top:8px;
+color:var(--gold);
+font-size:10px;
+letter-spacing:2px;
+}
+
+.topline{
+display:flex;
+justify-content:flex-end;
+align-items:center;
+gap:8px;
+padding:0 18px 15px;
+}
+
+.profile-button,.admin-button{
+border:1px solid var(--line);
+background:var(--card);
+border-radius:20px;
+padding:9px 13px;
+color:var(--dark);
+font-size:12px;
+}
+
 .admin-button{display:none}
-.categories{display:flex;gap:8px;overflow-x:auto;padding:5px 18px 16px;scrollbar-width:none}
+
+.categories{
+display:flex;
+gap:8px;
+overflow-x:auto;
+padding:5px 18px 16px;
+scrollbar-width:none;
+}
+
 .categories::-webkit-scrollbar{display:none}
-.category{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:10px 16px;white-space:nowrap;color:var(--dark);font-size:13px}
-.category.active{background:var(--dark);color:white;border-color:var(--dark)}
-.section-title{margin:8px 18px 15px;font-size:18px;font-weight:700}
-.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;padding:0 14px}
-.product{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:0}
-.product-image{height:145px;background:#e9e3d9;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.product-image img{width:100%;height:100%;object-fit:cover}
+
+.category{
+border:1px solid var(--line);
+background:var(--card);
+border-radius:22px;
+padding:10px 16px;
+white-space:nowrap;
+color:var(--dark);
+font-size:13px;
+}
+
+.category.active{
+background:var(--dark);
+color:white;
+border-color:var(--dark);
+}
+
+.section-title{
+margin:8px 18px 15px;
+font-size:18px;
+font-weight:700;
+}
+
+.products{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:13px;
+padding:0 14px;
+}
+
+.product{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:16px;
+overflow:hidden;
+min-width:0;
+}
+
+.product-image{
+height:145px;
+background:#e9e3d9;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+.product-image img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
 .no-image{font-size:38px;opacity:.4}
+
 .product-info{padding:12px}
 .product-name{font-size:15px;font-weight:700;margin-bottom:6px}
-.product-description{color:var(--muted);font-size:11px;line-height:1.4;min-height:29px}
-.product-bottom{display:flex;justify-content:space-between;align-items:center;gap:5px;margin-top:12px}
+
+.product-description{
+color:var(--muted);
+font-size:11px;
+line-height:1.4;
+min-height:29px;
+}
+
+.product-bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:5px;
+margin-top:12px;
+}
+
 .price{font-size:15px;font-weight:700}
-.add-button{background:var(--dark);color:white;border:0;border-radius:20px;padding:9px 13px;font-size:12px}
-.empty{padding:35px 20px;text-align:center;color:var(--muted);grid-column:1/-1}
-.bottom-cart{position:fixed;bottom:0;left:0;right:0;z-index:5;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(245,241,233,.96);border-top:1px solid var(--line)}
-.cart-button{width:100%;background:var(--dark);color:white;border:0;border-radius:13px;padding:16px;display:flex;justify-content:space-between;font-weight:700}
-.overlay{position:fixed;inset:0;z-index:20;background:rgba(25,22,19,.55);display:none;align-items:flex-end;justify-content:center}
+
+.add-button{
+background:var(--dark);
+color:white;
+border:0;
+border-radius:20px;
+padding:9px 13px;
+font-size:12px;
+}
+
+.empty{
+padding:35px 20px;
+text-align:center;
+color:var(--muted);
+grid-column:1/-1;
+}
+
+.bottom-cart{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+z-index:5;
+padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+background:rgba(245,241,233,.96);
+border-top:1px solid var(--line);
+}
+
+.cart-button{
+width:100%;
+background:var(--dark);
+color:white;
+border:0;
+border-radius:13px;
+padding:16px;
+display:flex;
+justify-content:space-between;
+font-weight:700;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+z-index:20;
+background:rgba(25,22,19,.55);
+display:none;
+align-items:flex-end;
+justify-content:center;
+}
+
 .overlay.show{display:flex}
-.modal{width:100%;max-width:560px;max-height:94vh;overflow-y:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom))}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+
+.modal{
+width:100%;
+max-width:560px;
+max-height:94vh;
+overflow-y:auto;
+background:var(--bg);
+border-radius:22px 22px 0 0;
+padding:22px 18px calc(22px + env(safe-area-inset-bottom));
+}
+
+.modal-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
 .modal-title{font-size:20px;font-weight:700}
-.close{border:0;background:#e9e2d8;width:34px;height:34px;border-radius:50%;font-size:19px}
-.field{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
+
+.close{
+border:0;
+background:#e9e2d8;
+width:34px;
+height:34px;
+border-radius:50%;
+font-size:19px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:7px;
+margin-bottom:13px;
+}
+
 .field label{font-size:12px;color:var(--muted)}
-.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:13px;color:var(--dark);outline:none}
+
+.field input,.field textarea,.field select{
+width:100%;
+border:1px solid var(--line);
+background:var(--card);
+border-radius:10px;
+padding:13px;
+color:var(--dark);
+outline:none;
+}
+
 .field textarea{min-height:75px;resize:vertical}
-.primary{width:100%;border:0;border-radius:12px;padding:15px;background:var(--dark);color:white;font-weight:700}
+
+.primary{
+width:100%;
+border:0;
+border-radius:12px;
+padding:15px;
+background:var(--dark);
+color:white;
+font-weight:700;
+}
+
 .primary:disabled{opacity:.55;cursor:not-allowed}
-.secondary{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card);color:var(--dark);margin-top:9px}
-.group{margin:18px 0;padding-bottom:14px;border-bottom:1px solid var(--line)}
+
+.secondary{
+width:100%;
+border:1px solid var(--line);
+border-radius:12px;
+padding:13px;
+background:var(--card);
+color:var(--dark);
+margin-top:9px;
+}
+
+.group{
+margin:18px 0;
+padding-bottom:14px;
+border-bottom:1px solid var(--line);
+}
+
 .group-title{font-size:15px;font-weight:700;margin-bottom:11px}
 .group-note{color:var(--muted);font-size:11px;margin-top:4px}
-.option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;font-size:13px}
-.option label{display:flex;gap:9px;align-items:center;flex:1}
+
+.option{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+padding:11px 0;
+font-size:13px;
+}
+
+.option label{
+display:flex;
+gap:9px;
+align-items:center;
+flex:1;
+}
+
 .option input{accent-color:var(--dark)}
 .option-price{color:var(--muted);white-space:nowrap}
-.modal-total{display:flex;justify-content:space-between;font-weight:700;margin:18px 0}
-.cart-line{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}
-.cart-line-top{display:flex;justify-content:space-between;gap:10px;font-weight:700}
-.cart-details{color:var(--muted);font-size:11px;line-height:1.5;margin-top:7px}
-.cart-line-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+
+.modal-total{
+display:flex;
+justify-content:space-between;
+font-weight:700;
+margin:18px 0;
+}
+
+.cart-line{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:12px;
+padding:13px;
+margin-bottom:10px;
+}
+
+.cart-line-top{
+display:flex;
+justify-content:space-between;
+gap:10px;
+font-weight:700;
+}
+
+.cart-details{
+color:var(--muted);
+font-size:11px;
+line-height:1.5;
+margin-top:7px;
+}
+
+.cart-line-bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:10px;
+}
+
 .quantity{display:flex;align-items:center;gap:13px}
-.quantity button{width:29px;height:29px;border:0;border-radius:50%;background:#e9e2d8}
-.remove{color:var(--danger);border:0;background:none;font-size:12px}
-.total-row{display:flex;justify-content:space-between;padding:16px 0;font-weight:700;font-size:18px}
-.notice{padding:12px;background:#eee8dd;border-radius:10px;font-size:12px;color:var(--muted);margin-bottom:13px;line-height:1.5}
-.admin-tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:16px}
-.admin-tab{white-space:nowrap;border:1px solid var(--line);border-radius:18px;background:var(--card);padding:9px 13px;font-size:12px}
+
+.quantity button{
+width:29px;
+height:29px;
+border:0;
+border-radius:50%;
+background:#e9e2d8;
+}
+
+.remove{
+color:var(--danger);
+border:0;
+background:none;
+font-size:12px;
+}
+
+.total-row{
+display:flex;
+justify-content:space-between;
+padding:16px 0;
+font-weight:700;
+font-size:18px;
+}
+
+.notice{
+padding:12px;
+background:#eee8dd;
+border-radius:10px;
+font-size:12px;
+color:var(--muted);
+margin-bottom:13px;
+line-height:1.5;
+}
+
+.admin-tabs{
+display:flex;
+gap:7px;
+overflow-x:auto;
+margin-bottom:16px;
+}
+
+.admin-tab{
+white-space:nowrap;
+border:1px solid var(--line);
+border-radius:18px;
+background:var(--card);
+padding:9px 13px;
+font-size:12px;
+}
+
 .admin-tab.active{background:var(--dark);color:white}
-.admin-item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px;margin-bottom:9px;font-size:13px}
+
+.admin-item{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:11px;
+padding:12px;
+margin-bottom:9px;
+font-size:13px;
+}
+
 .admin-item small{color:var(--muted);line-height:1.5}
-.admin-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.admin-actions button{border:1px solid var(--line);background:#f2ede5;border-radius:8px;padding:8px 10px;font-size:11px}
-.admin-actions button.danger{color:var(--danger);border-color:#e4c7c1}
-.admin-form{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:15px}
+
+.admin-actions{
+display:flex;
+gap:8px;
+margin-top:10px;
+flex-wrap:wrap;
+}
+
+.admin-actions button{
+border:1px solid var(--line);
+background:#f2ede5;
+border-radius:8px;
+padding:8px 10px;
+font-size:11px;
+}
+
+.admin-actions button.danger{
+color:var(--danger);
+border-color:#e4c7c1;
+}
+
+.admin-form{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:13px;
+padding:14px;
+margin-bottom:15px;
+}
+
 .admin-form h3{font-size:15px;margin:0 0 13px}
-.check-row{display:flex;align-items:center;gap:8px;font-size:12px;margin:10px 0}
-.toast{position:fixed;z-index:50;bottom:95px;left:50%;transform:translateX(-50%);background:var(--dark);color:white;border-radius:20px;padding:12px 18px;font-size:12px;display:none;max-width:90%;text-align:center}
+
+.check-row{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:12px;
+margin:10px 0;
+}
+
+.toast{
+position:fixed;
+z-index:50;
+bottom:95px;
+left:50%;
+transform:translateX(-50%);
+background:var(--dark);
+color:white;
+border-radius:20px;
+padding:12px 18px;
+font-size:12px;
+display:none;
+max-width:90%;
+text-align:center;
+}
+
 .toast.show{display:block}
-.loading{text-align:center;color:var(--muted);padding:35px;grid-column:1/-1}
-.checkout-section{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:12px}
-.checkout-section-title{font-size:13px;font-weight:700;margin-bottom:10px}
-.checkout-product{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+
+.loading{
+text-align:center;
+color:var(--muted);
+padding:35px;
+grid-column:1/-1;
+}
+
+.checkout-section{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:13px;
+padding:14px;
+margin-bottom:12px;
+}
+
+.checkout-section-title{
+font-size:13px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.checkout-product{
+display:flex;
+justify-content:space-between;
+gap:12px;
+padding:9px 0;
+border-bottom:1px solid var(--line);
+font-size:13px;
+}
+
 .checkout-product:last-child{border-bottom:0}
-.checkout-product small{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.4}
+
+.checkout-product small{
+display:block;
+color:var(--muted);
+font-size:11px;
+margin-top:4px;
+line-height:1.4;
+}
+
 .checkout-customer{font-size:13px;line-height:1.7}
-.error-box{display:none;background:#f7e7e3;color:#963e35;border:1px solid #e8c7c0;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:13px}
+
+.error-box{
+display:none;
+background:#f7e7e3;
+color:#963e35;
+border:1px solid #e8c7c0;
+padding:12px;
+border-radius:10px;
+font-size:12px;
+line-height:1.5;
+margin-bottom:13px;
+}
+
 .error-box.show{display:block}
-.success-mark{width:70px;height:70px;border-radius:50%;background:#e3eadf;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:36px;margin:25px auto 18px}
-.success-title{text-align:center;font-size:22px;font-weight:800;margin-bottom:9px}
-.success-text{text-align:center;color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:22px}
-.success-number{text-align:center;font-size:13px;font-weight:700;margin-bottom:20px}
-@media(min-width:600px){.products{grid-template-columns:repeat(3,minmax(0,1fr));max-width:900px;margin:auto}}
+
+.success-mark{
+width:70px;
+height:70px;
+border-radius:50%;
+background:#e3eadf;
+color:var(--green);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:36px;
+margin:25px auto 18px;
+}
+
+.success-title{
+text-align:center;
+font-size:22px;
+font-weight:800;
+margin-bottom:9px;
+}
+
+.success-text{
+text-align:center;
+color:var(--muted);
+font-size:13px;
+line-height:1.6;
+margin-bottom:22px;
+}
+
+.success-number{
+text-align:center;
+font-size:13px;
+font-weight:700;
+margin-bottom:20px;
+}
+
+@media(min-width:600px){
+.products{
+grid-template-columns:repeat(3,minmax(0,1fr));
+max-width:900px;
+margin:auto;
+}
+}
 </style>
 </head>
+
 <body>
+
+<!-- ЭКРАН ЗАГРУЗКИ -->
+<div id="splashScreen">
+<img src="./logo.jpg" alt="#ЗБС КОФЕЙНЯ">
+</div>
 
 <header>
 <div class="brand">#ЗБС КОФЕЙНЯ</div>
@@ -116,7 +605,9 @@ header{padding:27px 20px 20px;text-align:center}
 </div>
 
 <div class="section-title">Наше меню</div>
-<div class="products" id="products"><div class="loading">Загружаем меню...</div></div>
+<div class="products" id="products">
+<div class="loading">Загружаем меню...</div>
+</div>
 
 <div class="bottom-cart">
 <button class="cart-button" id="openCart">
@@ -132,44 +623,75 @@ header{padding:27px 20px 20px;text-align:center}
 <button class="close" data-close="productOverlay">×</button>
 </div>
 <div id="productModalContent"></div>
-<div class="modal-total"><span>Стоимость</span><span id="productModalTotal">0 ₽</span></div>
+<div class="modal-total">
+<span>Стоимость</span>
+<span id="productModalTotal">0 ₽</span>
+</div>
 <button class="primary" id="addConfiguredProduct">Добавить в корзину</button>
 </div>
 </div>
 
 <div class="overlay" id="cartOverlay">
 <div class="modal">
-<div class="modal-head"><div class="modal-title">Корзина</div><button class="close" data-close="cartOverlay">×</button></div>
+<div class="modal-head">
+<div class="modal-title">Корзина</div>
+<button class="close" data-close="cartOverlay">×</button>
+</div>
 <div id="cartContent"></div>
-<div class="total-row"><span>Итого</span><span id="cartModalTotal">0 ₽</span></div>
+<div class="total-row">
+<span>Итого</span>
+<span id="cartModalTotal">0 ₽</span>
+</div>
 <button class="primary" id="checkoutButton">Оформить предзаказ</button>
 </div>
 </div>
 
 <div class="overlay" id="profileOverlay">
 <div class="modal">
-<div class="modal-head"><div class="modal-title">Ваш профиль</div><button class="close" data-close="profileOverlay">×</button></div>
+<div class="modal-head">
+<div class="modal-title">Ваш профиль</div>
+<button class="close" data-close="profileOverlay">×</button>
+</div>
 <div class="notice" id="profileNotice">Данные используются для связи с бариста.</div>
-<div class="field"><label>Ваше имя</label><input id="profileName" maxlength="100" placeholder="Как к вам обращаться"></div>
-<div class="field"><label>Номер телефона</label><input id="profilePhone" maxlength="40" placeholder="+373..."></div>
+<div class="field">
+<label>Ваше имя</label>
+<input id="profileName" maxlength="100" placeholder="Как к вам обращаться">
+</div>
+<div class="field">
+<label>Номер телефона</label>
+<input id="profilePhone" maxlength="40" placeholder="+373...">
+</div>
 <button class="primary" id="saveProfile">Сохранить профиль</button>
 </div>
 </div>
 
 <div class="overlay" id="checkoutOverlay">
 <div class="modal">
-<div class="modal-head"><div class="modal-title">Оформление заказа</div><button class="close" data-close="checkoutOverlay">×</button></div>
+<div class="modal-head">
+<div class="modal-title">Оформление заказа</div>
+<button class="close" data-close="checkoutOverlay">×</button>
+</div>
+
 <div class="checkout-section">
 <div class="checkout-section-title">Ваш заказ</div>
 <div id="checkoutItems"></div>
-<div class="total-row" style="padding-bottom:0"><span>Итого</span><span id="checkoutTotal">0 ₽</span></div>
+<div class="total-row" style="padding-bottom:0">
+<span>Итого</span>
+<span id="checkoutTotal">0 ₽</span>
 </div>
+</div>
+
 <div class="checkout-section">
 <div class="checkout-section-title">Контактные данные</div>
 <div class="checkout-customer" id="checkoutCustomer"></div>
 <button class="secondary" id="editProfileFromCheckout">Изменить данные</button>
 </div>
-<div class="field"><label>Комментарий к заказу (необязательно)</label><textarea id="orderComment" maxlength="500" placeholder="Например: без крышки, пожалуйста"></textarea></div>
+
+<div class="field">
+<label>Комментарий к заказу (необязательно)</label>
+<textarea id="orderComment" maxlength="500" placeholder="Например: без крышки, пожалуйста"></textarea>
+</div>
+
 <div class="error-box" id="checkoutError"></div>
 <button class="primary" id="sendOrder">Отправить предзаказ</button>
 </div>
@@ -177,10 +699,16 @@ header{padding:27px 20px 20px;text-align:center}
 
 <div class="overlay" id="successOverlay">
 <div class="modal">
-<div class="modal-head"><div class="modal-title">Готово</div><button class="close" data-close="successOverlay">×</button></div>
+<div class="modal-head">
+<div class="modal-title">Готово</div>
+<button class="close" data-close="successOverlay">×</button>
+</div>
 <div class="success-mark">✓</div>
 <div class="success-title">Предзаказ отправлен!</div>
-<div class="success-text">Бариста получили ваш заказ и скоро займутся его приготовлением. Спасибо, что выбираете #ЗБС КОФЕЙНЯ.</div>
+<div class="success-text">
+Бариста получили ваш заказ и скоро займутся его приготовлением.
+Спасибо, что выбираете #ЗБС КОФЕЙНЯ.
+</div>
 <div class="success-number" id="successOrderNumber"></div>
 <button class="primary" id="successDone">Отлично</button>
 </div>
@@ -188,8 +716,15 @@ header{padding:27px 20px 20px;text-align:center}
 
 <div class="overlay" id="adminOverlay">
 <div class="modal">
-<div class="modal-head"><div class="modal-title">Панель управления</div><button class="close" data-close="adminOverlay">×</button></div>
-<div class="notice">Управление меню кофейни #ЗБС. Изменения сохраняются в базе данных.</div>
+<div class="modal-head">
+<div class="modal-title">Панель управления</div>
+<button class="close" data-close="adminOverlay">×</button>
+</div>
+
+<div class="notice">
+Управление меню кофейни #ЗБС. Изменения сохраняются в базе данных.
+</div>
+
 <div class="admin-tabs" id="adminTabs">
 <button class="admin-tab active" data-tab="products">Товары</button>
 <button class="admin-tab" data-tab="categories">Категории</button>
@@ -198,6 +733,7 @@ header{padding:27px 20px 20px;text-align:center}
 <button class="admin-tab" data-tab="links">Привязки</button>
 <button class="admin-tab" data-tab="sizes">Размеры</button>
 </div>
+
 <div id="adminContent"></div>
 </div>
 </div>
@@ -208,12 +744,11 @@ header{padding:27px 20px 20px;text-align:center}
 const API_URL="https://coffee-orders-api.eduard-raikovski.workers.dev/";
 const tg=window.Telegram?.WebApp;
 
-// Настройка отображения Mini App
+// НАСТРОЙКА TELEGRAM MINI APP
 if(tg){
     tg.ready();
     tg.expand();
 
-    // Отключаем сворачивание приложения свайпом вниз
     try{
         if(tg.isVersionAtLeast("7.7")){
             tg.disableVerticalSwipes();
@@ -222,11 +757,17 @@ if(tg){
         console.warn("Не удалось отключить вертикальные свайпы:",error);
     }
 
-    // Запрашиваем настоящий полноэкранный режим
     try{
         if(tg.isVersionAtLeast("8.0")){
             tg.setHeaderColor("#f5f1e9");
-            tg.requestFullscreen();
+
+            const fullscreenRequest=tg.requestFullscreen();
+
+            if(fullscreenRequest && typeof fullscreenRequest.catch==="function"){
+                fullscreenRequest.catch(error=>{
+                    console.warn("Не удалось включить полноэкранный режим:",error);
+                });
+            }
         }
     }catch(error){
         console.warn("Не удалось включить полноэкранный режим:",error);
@@ -238,6 +779,7 @@ if(tg){
 }
 
 const initData=tg?.initData||"";
+
 let categories=[],products=[],selectedCategory="all",cart=[];
 let currentProduct=null,currentAdminTab="products",adminData=null;
 let editingProductId=null,editingSizeId=null,editingCategoryId=null;
@@ -246,6 +788,17 @@ let profile={name:"",phone:""},registered=false;
 
 const $=id=>document.getElementById(id);
 
+function hideSplash(){
+const splash=$("splashScreen");
+if(!splash)return;
+
+splash.classList.add("hide");
+
+setTimeout(()=>{
+splash.remove();
+},500);
+}
+
 function showToast(message){
 const toast=$("toast");
 toast.textContent=message;
@@ -253,12 +806,21 @@ toast.classList.add("show");
 clearTimeout(showToast.timer);
 showToast.timer=setTimeout(()=>toast.classList.remove("show"),2600);
 }
-function openModal(id){$(id).classList.add("show")}
-function closeModal(id){$(id).classList.remove("show")}
+
+function openModal(id){
+$(id).classList.add("show");
+}
+
+function closeModal(id){
+$(id).classList.remove("show");
+}
 
 document.querySelectorAll("[data-close]").forEach(button=>{
-button.addEventListener("click",()=>closeModal(button.dataset.close));
+button.addEventListener("click",()=>{
+closeModal(button.dataset.close);
 });
+});
+
 document.querySelectorAll(".overlay").forEach(overlay=>{
 overlay.addEventListener("click",event=>{
 if(event.target===overlay)closeModal(overlay.id);
@@ -271,20 +833,34 @@ method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({...body,initData})
 });
+
 let result;
-try{result=await response.json()}
-catch{throw new Error("Сервер вернул некорректный ответ")}
+
+try{
+result=await response.json();
+}catch{
+throw new Error("Сервер вернул некорректный ответ");
+}
+
 if(!response.ok)throw new Error(result.error||"Ошибка запроса");
+
 return result;
 }
 
 function escapeText(value){
 return String(value??"").replace(/[&<>"']/g,c=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
 }[c]));
 }
 
-function asId(a,b){return String(a)===String(b)}
+function asId(a,b){
+return String(a)===String(b);
+}
+
 function numberValue(value,defaultValue=0){
 const n=Number(value);
 return Number.isFinite(n)?n:defaultValue;
@@ -296,24 +872,38 @@ if(!initData){
 $("profileNotice").textContent="Откройте приложение через Telegram, чтобы оформлять предзаказы.";
 return;
 }
+
 try{
 const result=await api("api/profile");
+
 registered=Boolean(result.registered);
-profile={name:result.name||"",phone:result.phone||""};
+
+profile={
+name:result.name||"",
+phone:result.phone||""
+};
+
 $("profileName").value=profile.name;
 $("profilePhone").value=profile.phone;
+
 if(!registered){
 $("profileNotice").textContent="Заполните имя и номер телефона для оформления предзаказов.";
 openModal("profileOverlay");
 }else{
 $("profileNotice").textContent="Данные сохранены. Их можно изменить в любой момент.";
 }
+
 const user=tg?.initDataUnsafe?.user;
-if(String(user?.id||"")==="931110633")$("adminButton").style.display="block";
-}catch(error){showToast(error.message)}
+
+if(String(user?.id||"")==="931110633"){
+$("adminButton").style.display="block";
 }
 
-// Остальной код приложения оставлен без изменений
+}catch(error){
+showToast(error.message);
+}
+}
+
 $("profileButton").addEventListener("click",()=>{
 $("profileName").value=profile.name;
 $("profilePhone").value=profile.phone;
@@ -323,28 +913,48 @@ openModal("profileOverlay");
 $("saveProfile").addEventListener("click",async()=>{
 const name=$("profileName").value.trim();
 const phone=$("profilePhone").value.trim();
-if(name.length<2||phone.length<5){showToast("Укажите имя и номер телефона");return}
+
+if(name.length<2||phone.length<5){
+showToast("Укажите имя и номер телефона");
+return;
+}
+
 const button=$("saveProfile");
 button.disabled=true;
+
 try{
 const result=await api("api/register",{name,phone});
-profile={name:result.name||name,phone:result.phone||phone};
+
+profile={
+name:result.name||name,
+phone:result.phone||phone
+};
+
 registered=true;
+
 closeModal("profileOverlay");
 showToast("Профиль сохранён");
-}catch(error){showToast(error.message)}
-finally{button.disabled=false}
+
+}catch(error){
+showToast(error.message);
+}finally{
+button.disabled=false;
+}
 });
 
 // МЕНЮ
 async function loadMenu(){
 $("products").innerHTML='<div class="loading">Загружаем меню...</div>';
+
 try{
 const result=await api("api/menu");
+
 categories=result.categories||[];
 products=result.products||[];
+
 renderCategories();
 renderProducts();
+
 }catch(error){
 $("products").innerHTML=`<div class="empty">Не удалось загрузить меню.<br>${escapeText(error.message)}</div>`;
 }
@@ -353,16 +963,32 @@ $("products").innerHTML=`<div class="empty">Не удалось загрузит
 function renderCategories(){
 const container=$("categories");
 container.innerHTML="";
+
 const all=document.createElement("button");
+
 all.className="category"+(selectedCategory==="all"?" active":"");
 all.textContent="Все";
-all.onclick=()=>{selectedCategory="all";renderCategories();renderProducts()};
+
+all.onclick=()=>{
+selectedCategory="all";
+renderCategories();
+renderProducts();
+};
+
 container.appendChild(all);
+
 categories.forEach(category=>{
 const button=document.createElement("button");
+
 button.className="category"+(asId(selectedCategory,category.id)?" active":"");
 button.textContent=category.name;
-button.onclick=()=>{selectedCategory=category.id;renderCategories();renderProducts()};
+
+button.onclick=()=>{
+selectedCategory=category.id;
+renderCategories();
+renderProducts();
+};
+
 container.appendChild(button);
 });
 }
@@ -370,21 +996,30 @@ container.appendChild(button);
 function renderProducts(){
 const container=$("products");
 container.innerHTML="";
-const visible=products.filter(product=>selectedCategory==="all"||asId(product.category_id,selectedCategory));
+
+const visible=products.filter(product=>
+selectedCategory==="all"||asId(product.category_id,selectedCategory)
+);
+
 if(!visible.length){
 container.innerHTML='<div class="empty">В этой категории пока нет товаров.</div>';
 return;
 }
+
 visible.forEach(product=>{
 const card=document.createElement("div");
 card.className="product";
+
 const image=product.image_url
 ?`<img src="${escapeText(product.image_url)}" alt="${escapeText(product.name)}" loading="lazy">`
 :'<div class="no-image">☕</div>';
+
 const sizes=product.sizes||[];
+
 const priceText=sizes.length
 ?`от ${Math.min(...sizes.map(s=>Number(s.price)))} ₽`
 :`${Number(product.price)} ₽`;
+
 card.innerHTML=`
 <div class="product-image">${image}</div>
 <div class="product-info">
@@ -395,7 +1030,9 @@ card.innerHTML=`
 <button class="add-button">Выбрать</button>
 </div>
 </div>`;
+
 card.querySelector(".add-button").onclick=()=>openProduct(product);
+
 container.appendChild(card);
 });
 }
@@ -403,126 +1040,204 @@ container.appendChild(card);
 // НАСТРОЙКИ ТОВАРА
 function openProduct(product){
 currentProduct=product;
+
 $("productModalTitle").textContent=product.name;
+
 const content=$("productModalContent");
 content.innerHTML="";
 
 const sizes=product.sizes||[];
+
 if(sizes.length){
 const section=document.createElement("div");
+
 section.className="group";
 section.innerHTML='<div class="group-title">Выберите размер</div><div class="group-note">Выбор размера обязателен</div>';
+
 sizes.forEach((size,index)=>{
 const row=document.createElement("div");
 row.className="option";
+
 const label=document.createElement("label");
+
 const input=document.createElement("input");
 input.type="radio";
 input.name="productSize";
 input.value=size.id;
 input.checked=index===0;
+
 const title=document.createElement("span");
 title.textContent=`${size.name} · ${size.volume_ml} мл`;
+
 label.append(input,title);
+
 const price=document.createElement("span");
 price.className="option-price";
 price.textContent=`${size.price} ₽`;
+
 row.append(label,price);
 section.appendChild(row);
+
 input.addEventListener("change",updateProductTotal);
 });
+
 content.appendChild(section);
 }
 
 const groups=product.groups||[];
+
 groups.forEach(group=>{
 const section=document.createElement("div");
 section.className="group";
-const note=group.selection_type==="single"?"Можно выбрать один вариант":`Можно выбрать до ${group.max_select} вариантов`;
-section.innerHTML=`<div class="group-title">${escapeText(group.name)}</div><div class="group-note">${note}${group.required?" · обязательно":""}</div>`;
+
+const note=group.selection_type==="single"
+?"Можно выбрать один вариант"
+:`Можно выбрать до ${group.max_select} вариантов`;
+
+section.innerHTML=`
+<div class="group-title">${escapeText(group.name)}</div>
+<div class="group-note">${note}${group.required?" · обязательно":""}</div>`;
+
 const inputType=group.selection_type==="single"?"radio":"checkbox";
 const groupName="group_"+group.id;
+
 (group.modifiers||[]).forEach(modifier=>{
 const row=document.createElement("div");
 row.className="option";
+
 const label=document.createElement("label");
+
 const input=document.createElement("input");
 input.type=inputType;
 input.name=groupName;
 input.value=modifier.id;
+
 const title=document.createElement("span");
 title.textContent=modifier.name;
+
 label.append(input,title);
+
 const price=document.createElement("span");
 price.className="option-price";
-price.textContent=Number(modifier.price_delta)>0?`+${modifier.price_delta} ₽`:"Бесплатно";
+
+price.textContent=Number(modifier.price_delta)>0
+?`+${modifier.price_delta} ₽`
+:"Бесплатно";
+
 row.append(label,price);
 section.appendChild(row);
+
 input.addEventListener("change",updateProductTotal);
 });
+
 content.appendChild(section);
 });
 
 if(!sizes.length&&!groups.length){
 content.innerHTML='<div class="notice">Для этого товара нет дополнительных настроек.</div>';
 }
+
 updateProductTotal();
 openModal("productOverlay");
 }
 
 function getSelectedSize(){
 if(!currentProduct)return null;
+
 const input=$("productModalContent").querySelector('input[name="productSize"]:checked');
+
 if(!input)return null;
+
 return (currentProduct.sizes||[]).find(size=>asId(size.id,input.value))||null;
 }
 
 function getSelectedModifiers(){
 if(!currentProduct)return[];
+
 return [...$("productModalContent").querySelectorAll('input[type="checkbox"]:checked,input[type="radio"]:checked')]
 .filter(input=>input.name!=="productSize")
 .map(input=>{
-const group=(currentProduct.groups||[]).find(g=>(g.modifiers||[]).some(m=>asId(m.id,input.value)));
+const group=(currentProduct.groups||[]).find(g=>
+(g.modifiers||[]).some(m=>asId(m.id,input.value))
+);
+
 const modifier=group?.modifiers.find(m=>asId(m.id,input.value));
-return modifier?{id:modifier.id,name:modifier.name,price_delta:numberValue(modifier.price_delta)}:null;
+
+return modifier
+?{
+id:modifier.id,
+name:modifier.name,
+price_delta:numberValue(modifier.price_delta)
+}
+:null;
 }).filter(Boolean);
 }
 
 function getCurrentBasePrice(){
 const size=getSelectedSize();
-return size?numberValue(size.price):numberValue(currentProduct?.price);
+
+return size
+?numberValue(size.price)
+:numberValue(currentProduct?.price);
 }
 
 function updateProductTotal(){
 if(!currentProduct)return;
-const additions=getSelectedModifiers().reduce((sum,item)=>sum+item.price_delta,0);
+
+const additions=getSelectedModifiers().reduce(
+(sum,item)=>sum+item.price_delta,0
+);
+
 $("productModalTotal").textContent=(getCurrentBasePrice()+additions)+" ₽";
 }
 
 $("addConfiguredProduct").addEventListener("click",()=>{
 if(!currentProduct)return;
+
 const selectedSize=getSelectedSize();
+
 if((currentProduct.sizes||[]).length&&!selectedSize){
 showToast("Сначала выберите размер");
 return;
 }
+
 const selected=getSelectedModifiers();
+
 for(const group of currentProduct.groups||[]){
-const count=selected.filter(item=>(group.modifiers||[]).some(modifier=>asId(modifier.id,item.id))).length;
-const minimum=group.required?Math.max(1,numberValue(group.min_select)):numberValue(group.min_select);
+const count=selected.filter(item=>
+(group.modifiers||[]).some(modifier=>asId(modifier.id,item.id))
+).length;
+
+const minimum=group.required
+?Math.max(1,numberValue(group.min_select))
+:numberValue(group.min_select);
+
 if(count<minimum||count>numberValue(group.max_select)){
 showToast(`Проверь выбор: ${group.name}`);
 return;
 }
 }
-const basePrice=selectedSize?numberValue(selectedSize.price):numberValue(currentProduct.price);
-const additions=selected.reduce((sum,item)=>sum+item.price_delta,0);
+
+const basePrice=selectedSize
+?numberValue(selectedSize.price)
+:numberValue(currentProduct.price);
+
+const additions=selected.reduce(
+(sum,item)=>sum+item.price_delta,0
+);
+
 const unitPrice=basePrice+additions;
+
 const sizeKey=selectedSize?selectedSize.id:"no-size";
-const key=currentProduct.id+"|"+sizeKey+"|"+selected.map(item=>item.id).sort().join(",");
+
+const key=currentProduct.id+"|"+sizeKey+"|"+
+selected.map(item=>item.id).sort().join(",");
+
 const existing=cart.find(item=>item.key===key);
-if(existing){existing.quantity++}
-else{
+
+if(existing){
+existing.quantity++;
+}else{
 cart.push({
 key,
 productId:currentProduct.id,
@@ -539,14 +1254,21 @@ unitPrice,
 quantity:1
 });
 }
+
 closeModal("productOverlay");
 renderCartButton();
 showToast("Добавлено в корзину");
 });
 
 // КОРЗИНА
-function cartTotal(){return cart.reduce((sum,item)=>sum+item.unitPrice*item.quantity,0)}
-function cartCount(){return cart.reduce((sum,item)=>sum+item.quantity,0)}
+function cartTotal(){
+return cart.reduce((sum,item)=>sum+item.unitPrice*item.quantity,0);
+}
+
+function cartCount(){
+return cart.reduce((sum,item)=>sum+item.quantity,0);
+}
+
 function renderCartButton(){
 $("cartCount").textContent=cartCount();
 $("cartTotal").textContent=cartTotal()+" ₽";
@@ -555,80 +1277,134 @@ $("cartTotal").textContent=cartTotal()+" ₽";
 function renderCart(){
 const container=$("cartContent");
 container.innerHTML="";
+
 if(!cart.length){
 container.innerHTML='<div class="empty">Корзина пока пуста.</div>';
 $("cartModalTotal").textContent="0 ₽";
 $("checkoutButton").disabled=true;
 return;
 }
+
 $("checkoutButton").disabled=false;
+
 cart.forEach(item=>{
 const line=document.createElement("div");
 line.className="cart-line";
+
 const details=[
 item.size?`${escapeText(item.size.name)} · ${item.size.volume_ml} мл`:"",
-item.modifiers.length?item.modifiers.map(m=>`${escapeText(m.name)} (${m.price_delta>0?"+"+m.price_delta+" ₽":"бесплатно"})`).join("<br>"):"Без добавок"
+item.modifiers.length
+?item.modifiers.map(m=>
+`${escapeText(m.name)} (${m.price_delta>0?"+"+m.price_delta+" ₽":"бесплатно"})`
+).join("<br>")
+:"Без добавок"
 ].filter(Boolean).join("<br>");
+
 line.innerHTML=`
-<div class="cart-line-top"><span>${escapeText(item.name)}</span><span>${item.unitPrice*item.quantity} ₽</span></div>
+<div class="cart-line-top">
+<span>${escapeText(item.name)}</span>
+<span>${item.unitPrice*item.quantity} ₽</span>
+</div>
 <div class="cart-details">${details}</div>
 <div class="cart-line-bottom">
 <div class="quantity">
-<button data-action="minus">−</button><span>${item.quantity}</span>
+<button data-action="minus">−</button>
+<span>${item.quantity}</span>
 <button data-action="plus">+</button>
 </div>
 <button class="remove">Удалить</button>
 </div>`;
+
 line.querySelector('[data-action="minus"]').onclick=()=>{
 item.quantity--;
-if(item.quantity<=0)cart=cart.filter(x=>x.key!==item.key);
-renderCart();renderCartButton();
+
+if(item.quantity<=0){
+cart=cart.filter(x=>x.key!==item.key);
+}
+
+renderCart();
+renderCartButton();
 };
+
 line.querySelector('[data-action="plus"]').onclick=()=>{
 if(item.quantity>=20)return showToast("Максимум 20 штук");
-item.quantity++;renderCart();renderCartButton();
+
+item.quantity++;
+
+renderCart();
+renderCartButton();
 };
+
 line.querySelector(".remove").onclick=()=>{
-cart=cart.filter(x=>x.key!==item.key);renderCart();renderCartButton();
+cart=cart.filter(x=>x.key!==item.key);
+
+renderCart();
+renderCartButton();
 };
+
 container.appendChild(line);
 });
+
 $("cartModalTotal").textContent=cartTotal()+" ₽";
 }
 
-$("openCart").addEventListener("click",()=>{renderCart();openModal("cartOverlay")});
+$("openCart").addEventListener("click",()=>{
+renderCart();
+openModal("cartOverlay");
+});
 
 // ОФОРМЛЕНИЕ ЗАКАЗА
 function renderCheckout(){
 const container=$("checkoutItems");
 container.innerHTML="";
+
 cart.forEach(item=>{
 const row=document.createElement("div");
 row.className="checkout-product";
+
 const details=[
 item.size?`${escapeText(item.size.name)} · ${item.size.volume_ml} мл`:"",
-item.modifiers.length?item.modifiers.map(m=>escapeText(m.name)+(m.price_delta>0?` (+${m.price_delta} ₽)`:"")).join(", "):"Без добавок"
+item.modifiers.length
+?item.modifiers.map(m=>
+escapeText(m.name)+(m.price_delta>0?` (+${m.price_delta} ₽)`:"")
+).join(", ")
+:"Без добавок"
 ].filter(Boolean).join("<br>");
+
 row.innerHTML=`
-<div><b>${escapeText(item.name)} × ${item.quantity}</b><small>${details}</small></div>
+<div>
+<b>${escapeText(item.name)} × ${item.quantity}</b>
+<small>${details}</small>
+</div>
 <b>${item.unitPrice*item.quantity} ₽</b>`;
+
 container.appendChild(row);
 });
-$("checkoutCustomer").innerHTML=`<b>${escapeText(profile.name)}</b><br>${escapeText(profile.phone)}`;
+
+$("checkoutCustomer").innerHTML=
+`<b>${escapeText(profile.name)}</b><br>${escapeText(profile.phone)}`;
+
 $("checkoutTotal").textContent=cartTotal()+" ₽";
+
 $("checkoutError").classList.remove("show");
 $("checkoutError").textContent="";
 }
 
 $("checkoutButton").addEventListener("click",()=>{
 if(!cart.length)return;
-if(!initData){showToast("Откройте приложение через Telegram");return}
+
+if(!initData){
+showToast("Откройте приложение через Telegram");
+return;
+}
+
 if(!registered){
 closeModal("cartOverlay");
 openModal("profileOverlay");
 showToast("Сначала заполните профиль");
 return;
 }
+
 renderCheckout();
 closeModal("cartOverlay");
 openModal("checkoutOverlay");
@@ -637,18 +1413,23 @@ openModal("checkoutOverlay");
 $("editProfileFromCheckout").addEventListener("click",()=>{
 $("profileName").value=profile.name;
 $("profilePhone").value=profile.phone;
+
 closeModal("checkoutOverlay");
 openModal("profileOverlay");
 });
 
 $("sendOrder").addEventListener("click",async()=>{
 if(!cart.length)return;
+
 const button=$("sendOrder");
 const errorBox=$("checkoutError");
+
 errorBox.classList.remove("show");
 errorBox.textContent="";
+
 button.disabled=true;
 button.textContent="Отправляем...";
+
 try{
 const result=await api("api/orders",{
 items:cart.map(item=>({
@@ -659,24 +1440,41 @@ modifiers:item.modifiers.map(modifier=>modifier.id)
 })),
 comment:$("orderComment").value.trim()
 });
+
 cart=[];
 $("orderComment").value="";
+
 renderCartButton();
+
 closeModal("checkoutOverlay");
+
 const orderNumber=result.orderId||result.order_id||result.id||"";
-$("successOrderNumber").textContent=orderNumber?"Номер заказа: "+orderNumber:"";
+
+$("successOrderNumber").textContent=
+orderNumber?"Номер заказа: "+orderNumber:"";
+
 openModal("successOverlay");
-if(tg?.HapticFeedback)tg.HapticFeedback.notificationOccurred("success");
+
+if(tg?.HapticFeedback){
+tg.HapticFeedback.notificationOccurred("success");
+}
+
 }catch(error){
-errorBox.textContent="Не удалось отправить заказ: "+error.message+". Ваш заказ остался в корзине. Попробуйте ещё раз.";
+errorBox.textContent=
+"Не удалось отправить заказ: "+error.message+
+". Ваш заказ остался в корзине. Попробуйте ещё раз.";
+
 errorBox.classList.add("show");
+
 }finally{
 button.disabled=false;
 button.textContent="Отправить предзаказ";
 }
 });
 
-$("successDone").addEventListener("click",()=>closeModal("successOverlay"));
+$("successDone").addEventListener("click",()=>{
+closeModal("successOverlay");
+});
 
 // АДМИН-ПАНЕЛЬ
 $("adminButton").addEventListener("click",async()=>{
@@ -686,39 +1484,73 @@ await loadAdmin();
 
 async function loadAdmin(){
 $("adminContent").innerHTML='<div class="loading">Загружаем данные...</div>';
+
 try{
 adminData=await api("api/admin",{action:"list"});
 renderAdmin();
+
 }catch(error){
-$("adminContent").innerHTML=`<div class="empty">${escapeText(error.message)}</div>`;
+$("adminContent").innerHTML=
+`<div class="empty">${escapeText(error.message)}</div>`;
 }
 }
 
 $("adminTabs").addEventListener("click",event=>{
 const button=event.target.closest("[data-tab]");
+
 if(!button)return;
+
 currentAdminTab=button.dataset.tab;
-document.querySelectorAll(".admin-tab").forEach(tab=>tab.classList.toggle("active",tab===button));
+
+document.querySelectorAll(".admin-tab").forEach(tab=>{
+tab.classList.toggle("active",tab===button);
+});
+
 renderAdmin();
 });
 
 function adminInput(label,name,placeholder="",type="text",value="",required=false){
-return `<div class="field"><label>${label}</label><input name="${name}" type="${type}" placeholder="${escapeText(placeholder)}" value="${escapeText(value)}" ${required?"required":""}></div>`;
+return `
+<div class="field">
+<label>${label}</label>
+<input
+name="${name}"
+type="${type}"
+placeholder="${escapeText(placeholder)}"
+value="${escapeText(value)}"
+${required?"required":""}>
+</div>`;
 }
 
 function adminTextarea(label,name,value="",placeholder=""){
-return `<div class="field"><label>${label}</label><textarea name="${name}" placeholder="${escapeText(placeholder)}">${escapeText(value)}</textarea></div>`;
+return `
+<div class="field">
+<label>${label}</label>
+<textarea name="${name}" placeholder="${escapeText(placeholder)}">${escapeText(value)}</textarea>
+</div>`;
 }
 
 function adminSelect(label,name,options,selectedValue="",required=true){
 const opts=(options||[]).map(option=>
 `<option value="${escapeText(option.value)}"${asId(option.value,selectedValue)?" selected":""}>${escapeText(option.label)}</option>`
 ).join("");
-return `<div class="field"><label>${label}</label><select name="${name}" ${required?"required":""}>${opts||'<option value="">Нет доступных вариантов</option>'}</select></div>`;
+
+return `
+<div class="field">
+<label>${label}</label>
+<select name="${name}" ${required?"required":""}>
+${opts||'<option value="">Нет доступных вариантов</option>'}
+</select>
+</div>`;
 }
 
 function adminForm(title,fields,action,buttonText="Сохранить"){
-return `<form class="admin-form" data-admin-action="${action}"><h3>${title}</h3>${fields}<button class="primary" type="submit">${buttonText}</button></form>`;
+return `
+<form class="admin-form" data-admin-action="${action}">
+<h3>${title}</h3>
+${fields}
+<button class="primary" type="submit">${buttonText}</button>
+</form>`;
 }
 
 function productTypeOptions(){
@@ -733,81 +1565,156 @@ return [
 
 function productForm(item=null){
 const editing=Boolean(item);
-const categoryOptions=(adminData.categories||[]).map(c=>({value:c.id,label:c.name}));
-return `<form class="admin-form" data-admin-action="${editing?"product.update":"product.create"}">
+
+const categoryOptions=(adminData.categories||[]).map(c=>({
+value:c.id,
+label:c.name
+}));
+
+return `
+<form class="admin-form" data-admin-action="${editing?"product.update":"product.create"}">
 <h3>${editing?"Редактирование товара":"Новый товар"}</h3>
+
 ${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+
 ${adminSelect("Категория","category_id",categoryOptions,item?.category_id||"")}
+
 ${adminInput("Название","name","Например: Раф","text",item?.name||"",true)}
+
 ${adminTextarea("Описание","description",item?.description||"","Краткое описание")}
+
 ${adminInput("Цена","price","100","number",item?.price??"",true)}
+
 ${adminInput("Ссылка на фотографию","image_url","https://...","url",item?.image_url||"")}
+
 ${adminSelect("Тип товара","product_type",productTypeOptions(),item?.product_type||"food")}
+
 ${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
-<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить товар"}</button>
+
+<button class="primary" type="submit">
+${editing?"Сохранить изменения":"Добавить товар"}
+</button>
+
 ${editing?'<button class="secondary" type="button" data-cancel-edit="product">Отмена</button>':""}
 </form>`;
 }
 
 function sizeForm(item=null){
 const editing=Boolean(item);
-const productOptions=(adminData.products||[]).map(p=>({value:p.id,label:p.name}));
-return `<form class="admin-form" data-admin-action="${editing?"size.update":"size.create"}">
+
+const productOptions=(adminData.products||[]).map(p=>({
+value:p.id,
+label:p.name
+}));
+
+return `
+<form class="admin-form" data-admin-action="${editing?"size.update":"size.create"}">
 <h3>${editing?"Редактирование размера":"Добавить размер"}</h3>
+
 ${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+
 ${adminSelect("Товар","product_id",productOptions,item?.product_id||"")}
+
 ${adminInput("Название размера","name","Например: Большой","text",item?.name||"",true)}
+
 ${adminInput("Объём (мл)","volume_ml","400","number",item?.volume_ml??"",true)}
+
 ${adminInput("Цена","price","100","number",item?.price??"",true)}
+
 ${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
-<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить размер"}</button>
+
+<button class="primary" type="submit">
+${editing?"Сохранить изменения":"Добавить размер"}
+</button>
+
 ${editing?'<button class="secondary" type="button" data-cancel-edit="size">Отмена</button>':""}
 </form>`;
 }
 
 function categoryForm(item=null){
 const editing=Boolean(item);
-return `<form class="admin-form" data-admin-action="${editing?"category.update":"category.create"}">
+
+return `
+<form class="admin-form" data-admin-action="${editing?"category.update":"category.create"}">
 <h3>${editing?"Редактирование категории":"Новая категория"}</h3>
+
 ${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+
 ${adminInput("Название","name","Например: Десерты","text",item?.name||"",true)}
+
 ${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
-<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить категорию"}</button>
+
+<button class="primary" type="submit">
+${editing?"Сохранить изменения":"Добавить категорию"}
+</button>
+
 ${editing?'<button class="secondary" type="button" data-cancel-edit="category">Отмена</button>':""}
 </form>`;
 }
 
 function groupForm(item=null){
 const editing=Boolean(item);
+
 const typeOptions=[
 {value:"single",label:"Один вариант"},
 {value:"multiple",label:"Несколько вариантов"}
 ];
-return `<form class="admin-form" data-admin-action="${editing?"group.update":"group.create"}">
+
+return `
+<form class="admin-form" data-admin-action="${editing?"group.update":"group.create"}">
 <h3>${editing?"Редактирование группы":"Новая группа настроек"}</h3>
+
 ${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+
 ${adminInput("Название","name","Например: Молоко","text",item?.name||"",true)}
+
 ${adminSelect("Тип выбора","selection_type",typeOptions,item?.selection_type||"multiple")}
+
 ${adminInput("Минимум выборов","min_select","0","number",item?.min_select??0,true)}
+
 ${adminInput("Максимум выборов","max_select","99","number",item?.max_select??99,true)}
-<label class="check-row"><input type="checkbox" name="required" ${item?.required?"checked":""}> Обязательный выбор</label>
+
+<label class="check-row">
+<input type="checkbox" name="required" ${item?.required?"checked":""}>
+Обязательный выбор
+</label>
+
 ${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
-<button class="primary" type="submit">${editing?"Сохранить изменения":"Создать группу"}</button>
+
+<button class="primary" type="submit">
+${editing?"Сохранить изменения":"Создать группу"}
+</button>
+
 ${editing?'<button class="secondary" type="button" data-cancel-edit="group">Отмена</button>':""}
 </form>`;
 }
 
 function modifierForm(item=null){
 const editing=Boolean(item);
-const groupOptions=(adminData.groups||[]).map(g=>({value:g.id,label:g.name}));
-return `<form class="admin-form" data-admin-action="${editing?"modifier.update":"modifier.create"}">
+
+const groupOptions=(adminData.groups||[]).map(g=>({
+value:g.id,
+label:g.name
+}));
+
+return `
+<form class="admin-form" data-admin-action="${editing?"modifier.update":"modifier.create"}">
 <h3>${editing?"Редактирование добавки":"Новая добавка"}</h3>
+
 ${editing?`<input type="hidden" name="id" value="${escapeText(item.id)}">`:""}
+
 ${adminSelect("Группа","group_id",groupOptions,item?.group_id||"")}
+
 ${adminInput("Название","name","Например: Ваниль","text",item?.name||"",true)}
+
 ${adminInput("Доплата","price_delta","15","number",item?.price_delta??0,true)}
+
 ${adminInput("Порядок отображения","sort_order","0","number",item?.sort_order??0,true)}
-<button class="primary" type="submit">${editing?"Сохранить изменения":"Добавить вариант"}</button>
+
+<button class="primary" type="submit">
+${editing?"Сохранить изменения":"Добавить вариант"}
+</button>
+
 ${editing?'<button class="secondary" type="button" data-cancel-edit="modifier">Отмена</button>':""}
 </form>`;
 }
@@ -815,128 +1722,219 @@ ${editing?'<button class="secondary" type="button" data-cancel-edit="modifier">�
 // РЕНДЕР АДМИНКИ
 function renderAdmin(){
 if(!adminData)return;
-const d=adminData,content=$("adminContent");
+
+const d=adminData;
+const content=$("adminContent");
+
 content.innerHTML="";
 
 if(currentAdminTab==="categories"){
-const editing=(d.categories||[]).find(item=>asId(item.id,editingCategoryId));
+const editing=(d.categories||[]).find(item=>
+asId(item.id,editingCategoryId)
+);
+
 content.innerHTML=categoryForm(editing||null)+
 (d.categories||[]).map(item=>{
 const active=Boolean(Number(item.active));
+
 return adminItem(
 item.name,
 `Порядок: ${item.sort_order} · ${active?"Активна":"Скрыта"}`,
-"category.toggle",item.id,active,
-"data-edit-category","Редактировать","data-delete-category"
+"category.toggle",
+item.id,
+active,
+"data-edit-category",
+"Редактировать",
+"data-delete-category"
 );
 }).join("");
 }
 
 if(currentAdminTab==="products"){
-const editing=(d.products||[]).find(item=>asId(item.id,editingProductId));
+const editing=(d.products||[]).find(item=>
+asId(item.id,editingProductId)
+);
+
 content.innerHTML=productForm()+
 (editing?productForm(editing):"")+
 (d.products||[]).map(item=>{
-const category=d.categories.find(c=>asId(c.id,item.category_id));
-return `<div class="admin-item">
+const category=d.categories.find(c=>
+asId(c.id,item.category_id)
+);
+
+return `
+<div class="admin-item">
 <b>${escapeText(item.name)}</b><br>
-<small>${Number(item.price)} ₽ · ${escapeText(category?.name||"Без категории")} · ${Number(item.active)?"Активен":"Скрыт"}</small>
+<small>
+${Number(item.price)} ₽ ·
+${escapeText(category?.name||"Без категории")} ·
+${Number(item.active)?"Активен":"Скрыт"}
+</small>
 <div class="admin-actions">
 <button type="button" data-edit-product="${escapeText(item.id)}">Редактировать</button>
 <button type="button" data-toggle="product.toggle" data-id="${escapeText(item.id)}">${Number(item.active)?"Скрыть":"Включить"}</button>
 <button type="button" class="danger" data-delete-product="${escapeText(item.id)}">Удалить</button>
-</div></div>`;
+</div>
+</div>`;
 }).join("");
 }
 
 if(currentAdminTab==="groups"){
-const editing=(d.groups||[]).find(item=>asId(item.id,editingGroupId));
+const editing=(d.groups||[]).find(item=>
+asId(item.id,editingGroupId)
+);
+
 content.innerHTML=groupForm(editing||null)+
 (d.groups||[]).map(item=>{
 const active=Boolean(Number(item.active));
+
 return adminItem(
 item.name,
 `${item.selection_type==="single"?"Один вариант":"Несколько вариантов"} · минимум ${item.min_select} · максимум ${item.max_select} · ${active?"Активна":"Отключена"}`,
-"group.toggle",item.id,active,
-"data-edit-group","Редактировать","data-delete-group"
+"group.toggle",
+item.id,
+active,
+"data-edit-group",
+"Редактировать",
+"data-delete-group"
 );
 }).join("");
 }
 
 if(currentAdminTab==="modifiers"){
-const editing=(d.modifiers||[]).find(item=>asId(item.id,editingModifierId));
+const editing=(d.modifiers||[]).find(item=>
+asId(item.id,editingModifierId)
+);
+
 content.innerHTML=modifierForm(editing||null)+
 (d.modifiers||[]).map(item=>{
-const group=d.groups.find(g=>asId(g.id,item.group_id));
+const group=d.groups.find(g=>
+asId(g.id,item.group_id)
+);
+
 const active=Boolean(Number(item.active));
+
 return adminItem(
 item.name,
 `${group?.name||"Без группы"} · ${Number(item.price_delta)>0?"+":""}${item.price_delta} ₽ · ${active?"Активна":"Отключена"}`,
-"modifier.toggle",item.id,active,
-"data-edit-modifier","Редактировать","data-delete-modifier"
+"modifier.toggle",
+item.id,
+active,
+"data-edit-modifier",
+"Редактировать",
+"data-delete-modifier"
 );
 }).join("");
 }
 
 if(currentAdminTab==="links"){
-const productOptions=d.products.map(p=>({value:p.id,label:p.name}));
-const groupOptions=d.groups.map(g=>({value:g.id,label:g.name}));
+const productOptions=d.products.map(p=>({
+value:p.id,
+label:p.name
+}));
+
+const groupOptions=d.groups.map(g=>({
+value:g.id,
+label:g.name
+}));
+
 content.innerHTML=adminForm(
 "Привязать группу настроек к товару",
 adminSelect("Товар","product_id",productOptions)+
 adminSelect("Группа настроек","group_id",groupOptions)+
 adminInput("Порядок отображения","sort_order","0","number",0),
-"link.set","Сохранить привязку"
+"link.set",
+"Сохранить привязку"
 )+d.links.map(link=>{
-const product=d.products.find(p=>asId(p.id,link.product_id));
-const group=d.groups.find(g=>asId(g.id,link.group_id));
-return `<div class="admin-item">
+const product=d.products.find(p=>
+asId(p.id,link.product_id)
+);
+
+const group=d.groups.find(g=>
+asId(g.id,link.group_id)
+);
+
+return `
+<div class="admin-item">
 <b>${escapeText(product?.name||"Товар")}</b><br>
-<small>Группа: ${escapeText(group?.name||"Группа")} · Порядок: ${link.sort_order}</small>
+<small>
+Группа: ${escapeText(group?.name||"Группа")} ·
+Порядок: ${link.sort_order}
+</small>
 <div class="admin-actions">
-<button type="button" data-edit-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}" data-sort="${Number(link.sort_order)||0}">Изменить порядок</button>
-<button type="button" class="danger" data-remove-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}">Отвязать</button>
-</div></div>`;
+<button type="button"
+data-edit-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}"
+data-sort="${Number(link.sort_order)||0}">
+Изменить порядок
+</button>
+<button type="button"
+class="danger"
+data-remove-link="${escapeText(link.product_id)}|${escapeText(link.group_id)}">
+Отвязать
+</button>
+</div>
+</div>`;
 }).join("");
 }
 
 if(currentAdminTab==="sizes"){
-const editing=(d.sizes||[]).find(item=>asId(item.id,editingSizeId));
+const editing=(d.sizes||[]).find(item=>
+asId(item.id,editingSizeId)
+);
+
 content.innerHTML=sizeForm()+
 (editing?sizeForm(editing):"")+
 (d.sizes||[]).map(item=>{
 const active=Boolean(Number(item.active));
-return `<div class="admin-item">
+
+return `
+<div class="admin-item">
 <b>${escapeText(item.product_name||"Товар")} — ${escapeText(item.name)}</b><br>
-<small>${Number(item.volume_ml)} мл · ${Number(item.price)} ₽ · ${active?"Активен":"Отключён"}</small>
+<small>
+${Number(item.volume_ml)} мл ·
+${Number(item.price)} ₽ ·
+${active?"Активен":"Отключён"}
+</small>
 <div class="admin-actions">
 <button type="button" data-edit-size="${escapeText(item.id)}">Редактировать</button>
 <button type="button" data-toggle="size.toggle" data-id="${escapeText(item.id)}">${active?"Отключить":"Включить"}</button>
 <button type="button" class="danger" data-delete-size="${escapeText(item.id)}">Удалить</button>
-</div></div>`;
+</div>
+</div>`;
 }).join("");
 }
 
-if(!content.innerHTML.trim())content.innerHTML='<div class="empty">Пока нет записей.</div>';
+if(!content.innerHTML.trim()){
+content.innerHTML='<div class="empty">Пока нет записей.</div>';
+}
 }
 
 // СОХРАНЕНИЕ ФОРМ
 $("adminContent").addEventListener("submit",async event=>{
 const form=event.target.closest("[data-admin-action]");
+
 if(!form)return;
+
 event.preventDefault();
 
 const action=form.dataset.adminAction;
 const fd=new FormData(form);
 const data=Object.fromEntries(fd.entries());
+
 data.required=fd.has("required");
 
 ["price","price_delta","sort_order","min_select","max_select","volume_ml"].forEach(key=>{
-if(data[key]!==undefined)data[key]=Number(data[key]);
+if(data[key]!==undefined){
+data[key]=Number(data[key]);
+}
 });
 
 const submit=form.querySelector('button[type="submit"]');
-if(submit){submit.disabled=true;submit.textContent="Сохраняем..."}
+
+if(submit){
+submit.disabled=true;
+submit.textContent="Сохраняем...";
+}
 
 try{
 await api("api/admin",{action,data});
@@ -948,52 +1946,94 @@ if(action==="group.update")editingGroupId=null;
 if(action==="modifier.update")editingModifierId=null;
 
 showToast("Изменения сохранены");
+
 await loadAdmin();
 await loadMenu();
 
 }catch(error){
 showToast(error.message);
-if(submit){submit.disabled=false;submit.textContent="Повторить сохранение"}
+
+if(submit){
+submit.disabled=false;
+submit.textContent="Повторить сохранение";
+}
 }
 });
 
 // КНОПКИ АДМИНКИ
 $("adminContent").addEventListener("click",async event=>{
+
 const editProduct=event.target.closest("[data-edit-product]");
-if(editProduct){editingProductId=editProduct.dataset.editProduct;renderAdmin();return}
+
+if(editProduct){
+editingProductId=editProduct.dataset.editProduct;
+renderAdmin();
+return;
+}
 
 const editSize=event.target.closest("[data-edit-size]");
-if(editSize){editingSizeId=editSize.dataset.editSize;renderAdmin();return}
+
+if(editSize){
+editingSizeId=editSize.dataset.editSize;
+renderAdmin();
+return;
+}
 
 const editCategory=event.target.closest("[data-edit-category]");
-if(editCategory){editingCategoryId=editCategory.dataset.editCategory;renderAdmin();return}
+
+if(editCategory){
+editingCategoryId=editCategory.dataset.editCategory;
+renderAdmin();
+return;
+}
 
 const editGroup=event.target.closest("[data-edit-group]");
-if(editGroup){editingGroupId=editGroup.dataset.editGroup;renderAdmin();return}
+
+if(editGroup){
+editingGroupId=editGroup.dataset.editGroup;
+renderAdmin();
+return;
+}
 
 const editModifier=event.target.closest("[data-edit-modifier]");
-if(editModifier){editingModifierId=editModifier.dataset.editModifier;renderAdmin();return}
+
+if(editModifier){
+editingModifierId=editModifier.dataset.editModifier;
+renderAdmin();
+return;
+}
 
 const cancel=event.target.closest("[data-cancel-edit]");
+
 if(cancel){
 const type=cancel.dataset.cancelEdit;
+
 if(type==="product")editingProductId=null;
 if(type==="size")editingSizeId=null;
 if(type==="category")editingCategoryId=null;
 if(type==="group")editingGroupId=null;
 if(type==="modifier")editingModifierId=null;
+
 renderAdmin();
 return;
 }
 
 const editLink=event.target.closest("[data-edit-link]");
+
 if(editLink){
 const [product_id,group_id]=editLink.dataset.editLink.split("|");
+
 const currentSort=Number(editLink.dataset.sort)||0;
-const value=prompt("Новый порядок отображения группы:",String(currentSort));
+
+const value=prompt(
+"Новый порядок отображения группы:",
+String(currentSort)
+);
+
 if(value===null)return;
 
 const sort_order=Number(value);
+
 if(!Number.isSafeInteger(sort_order)||sort_order<0){
 showToast("Укажите целое число от 0");
 return;
@@ -1004,16 +2044,24 @@ await api("api/admin",{
 action:"link.set",
 data:{product_id,group_id,enabled:true,sort_order}
 });
+
 showToast("Порядок привязки изменён");
+
 await loadAdmin();
 await loadMenu();
-}catch(error){showToast(error.message)}
+
+}catch(error){
+showToast(error.message);
+}
+
 return;
 }
 
 const removeLink=event.target.closest("[data-remove-link]");
+
 if(removeLink){
 const [product_id,group_id]=removeLink.dataset.removeLink.split("|");
+
 if(!confirm("Отвязать эту группу настроек от товара?"))return;
 
 try{
@@ -1021,39 +2069,67 @@ await api("api/admin",{
 action:"link.set",
 data:{product_id,group_id,enabled:false}
 });
+
 showToast("Группа отвязана");
+
 await loadAdmin();
 await loadMenu();
-}catch(error){showToast(error.message)}
+
+}catch(error){
+showToast(error.message);
+}
+
 return;
 }
 
 const deleteCategory=event.target.closest("[data-delete-category]");
+
 if(deleteCategory){
 const id=deleteCategory.dataset.deleteCategory;
+
 const item=adminData?.categories?.find(x=>asId(x.id,id));
+
 if(!confirm(`Удалить категорию «${item?.name||""}»?`))return;
 
 deleteCategory.disabled=true;
+
 try{
-await api("api/admin",{action:"category.delete",data:{id}});
-if(asId(editingCategoryId,id))editingCategoryId=null;
+await api("api/admin",{
+action:"category.delete",
+data:{id}
+});
+
+if(asId(editingCategoryId,id)){
+editingCategoryId=null;
+}
+
 showToast("Категория удалена");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 deleteCategory.disabled=false;
 showToast(error.message);
 }
+
 return;
 }
 
 const deleteGroup=event.target.closest("[data-delete-group]");
+
 if(deleteGroup){
 const id=deleteGroup.dataset.deleteGroup;
+
 const item=adminData?.groups?.find(x=>asId(x.id,id));
-const modifiers=(adminData?.modifiers||[]).filter(x=>asId(x.group_id,id)).length;
-const links=(adminData?.links||[]).filter(x=>asId(x.group_id,id)).length;
+
+const modifiers=(adminData?.modifiers||[]).filter(x=>
+asId(x.group_id,id)
+).length;
+
+const links=(adminData?.links||[]).filter(x=>
+asId(x.group_id,id)
+).length;
 
 if(!confirm(
 `Удалить группу «${item?.name||""}»?\n\n`+
@@ -1062,103 +2138,178 @@ if(!confirm(
 ))return;
 
 deleteGroup.disabled=true;
+
 try{
-await api("api/admin",{action:"group.delete",data:{id}});
-if(asId(editingGroupId,id))editingGroupId=null;
+await api("api/admin",{
+action:"group.delete",
+data:{id}
+});
+
+if(asId(editingGroupId,id)){
+editingGroupId=null;
+}
+
 showToast("Группа и её содержимое удалены");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 deleteGroup.disabled=false;
 showToast(error.message);
 }
+
 return;
 }
 
 const deleteModifier=event.target.closest("[data-delete-modifier]");
+
 if(deleteModifier){
 const id=deleteModifier.dataset.deleteModifier;
+
 const item=adminData?.modifiers?.find(x=>asId(x.id,id));
+
 if(!confirm(`Удалить добавку «${item?.name||""}»?`))return;
 
 deleteModifier.disabled=true;
+
 try{
-await api("api/admin",{action:"modifier.delete",data:{id}});
-if(asId(editingModifierId,id))editingModifierId=null;
+await api("api/admin",{
+action:"modifier.delete",
+data:{id}
+});
+
+if(asId(editingModifierId,id)){
+editingModifierId=null;
+}
+
 showToast("Добавка удалена");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 deleteModifier.disabled=false;
 showToast(error.message);
 }
+
 return;
 }
 
 const deleteButton=event.target.closest("[data-delete-product]");
+
 if(deleteButton){
 const id=deleteButton.dataset.deleteProduct;
-const product=adminData?.products?.find(item=>asId(item.id,id));
+
+const product=adminData?.products?.find(item=>
+asId(item.id,id)
+);
+
 if(!confirm(`Удалить товар «${product?.name||"без названия"}»?`))return;
 
 deleteButton.disabled=true;
+
 try{
-await api("api/admin",{action:"product.delete",data:{id}});
-if(asId(editingProductId,id))editingProductId=null;
+await api("api/admin",{
+action:"product.delete",
+data:{id}
+});
+
+if(asId(editingProductId,id)){
+editingProductId=null;
+}
+
 showToast("Товар удалён");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 deleteButton.disabled=false;
 showToast(error.message);
 }
+
 return;
 }
 
 const deleteSizeButton=event.target.closest("[data-delete-size]");
+
 if(deleteSizeButton){
 const id=deleteSizeButton.dataset.deleteSize;
-const size=adminData?.sizes?.find(item=>asId(item.id,id));
+
+const size=adminData?.sizes?.find(item=>
+asId(item.id,id)
+);
+
 if(!confirm(`Удалить размер «${size?.name||""}»?`))return;
 
 deleteSizeButton.disabled=true;
+
 try{
-await api("api/admin",{action:"size.delete",data:{id}});
-if(asId(editingSizeId,id))editingSizeId=null;
+await api("api/admin",{
+action:"size.delete",
+data:{id}
+});
+
+if(asId(editingSizeId,id)){
+editingSizeId=null;
+}
+
 showToast("Размер удалён");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 deleteSizeButton.disabled=false;
 showToast(error.message);
 }
+
 return;
 }
 
 const button=event.target.closest("[data-toggle]");
+
 if(!button)return;
 
 const action=button.dataset.toggle;
 const id=button.dataset.id;
+
 button.disabled=true;
 
 try{
-await api("api/admin",{action,data:{id}});
+await api("api/admin",{
+action,
+data:{id}
+});
+
 showToast("Изменения сохранены");
+
 await loadAdmin();
 await loadMenu();
+
 }catch(error){
 button.disabled=false;
 showToast(error.message);
 }
 });
 
-// ЗАПУСК
+// ЗАПУСК ПРИЛОЖЕНИЯ
 async function startApp(){
 renderCartButton();
-await Promise.all([loadMenu(),loadProfile()]);
+
+try{
+await Promise.all([
+loadMenu(),
+loadProfile()
+]);
+}finally{
+hideSplash();
 }
+}
+
 startApp();
 </script>
+
 </body>
 </html>
