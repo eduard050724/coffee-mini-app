@@ -11,7 +11,7 @@
 --gold:#b49a68;--line:#e8e0d4;--green:#596b50;--danger:#a34e43
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif;padding-bottom:110px;padding-top:env(safe-area-inset-top)}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif;padding-bottom:110px}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 header{padding:27px 20px 20px;text-align:center}
@@ -207,7 +207,6 @@ header{padding:27px 20px 20px;text-align:center}
 const API_URL="https://coffee-orders-api.eduard-raikovski.workers.dev/";
 const tg=window.Telegram?.WebApp;
 
-// Настройка отображения Mini App
 if(tg){
     tg.ready();
     tg.expand();
@@ -223,12 +222,7 @@ if(tg){
     try{
         if(tg.isVersionAtLeast("8.0")){
             tg.setHeaderColor("#f5f1e9");
-            const fullscreenRequest=tg.requestFullscreen();
-            if(fullscreenRequest && typeof fullscreenRequest.catch==="function"){
-                fullscreenRequest.catch(error=>{
-                    console.warn("Не удалось включить полноэкранный режим:",error);
-                });
-            }
+            tg.requestFullscreen();
         }
     }catch(error){
         console.warn("Не удалось включить полноэкранный режим:",error);
@@ -813,17 +807,15 @@ ${editing?'<button class="secondary" type="button" data-cancel-edit="modifier">�
 </form>`;
 }
 
-// ОБЩИЙ ШАБЛОН ЭЛЕМЕНТОВ АДМИНКИ
-function adminItem(title,description,toggleAction,id,active,editAttribute,editLabel,deleteAttribute){
+// ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТОБРАЖЕНИЯ ЭЛЕМЕНТОВ АДМИНКИ
+function adminItem(title, description, toggleAction, id, active, editAttribute, editText, deleteAttribute){
 return `
 <div class="admin-item">
 <b>${escapeText(title)}</b><br>
 <small>${escapeText(description)}</small>
 <div class="admin-actions">
-<button type="button" ${editAttribute}="${escapeText(id)}">${escapeText(editLabel)}</button>
-<button type="button" data-toggle="${escapeText(toggleAction)}" data-id="${escapeText(id)}">
-${active?"Скрыть":"Включить"}
-</button>
+<button type="button" ${editAttribute}="${escapeText(id)}">${escapeText(editText)}</button>
+<button type="button" data-toggle="${escapeText(toggleAction)}" data-id="${escapeText(id)}">${active?"Скрыть":"Включить"}</button>
 <button type="button" class="danger" ${deleteAttribute}="${escapeText(id)}">Удалить</button>
 </div>
 </div>`;
