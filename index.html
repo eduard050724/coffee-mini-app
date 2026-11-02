@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -14,7 +15,35 @@
 body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif;padding-bottom:110px}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
-header{padding:27px 20px 20px;text-align:center}
+
+/* ЗАСТАВКА С ЛОГОТИПОМ */
+#splashScreen{
+position:fixed;
+inset:0;
+z-index:9999;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#fffdf9;
+padding:24px;
+transition:opacity .35s ease,visibility .35s ease;
+}
+#splashScreen img{
+display:block;
+width:min(72vw,340px);
+max-height:60vh;
+object-fit:contain;
+}
+#splashScreen.hide{
+opacity:0;
+visibility:hidden;
+pointer-events:none;
+}
+
+header{
+padding:calc(27px + max(env(safe-area-inset-top),var(--tg-content-safe-area-inset-top,0px))) 20px 20px;
+text-align:center
+}
 .brand{font-size:27px;font-weight:800;letter-spacing:2px}
 .slogan{margin-top:8px;color:var(--gold);font-size:10px;letter-spacing:2px}
 .topline{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:0 18px 15px}
@@ -99,6 +128,11 @@ header{padding:27px 20px 20px;text-align:center}
 </style>
 </head>
 <body>
+
+<!-- ЗАСТАВКА -->
+<div id="splashScreen">
+<img src="./logo.jpg" alt="#ЗБС КОФЕЙНЯ">
+</div>
 
 <header>
 <div class="brand">#ЗБС КОФЕЙНЯ</div>
@@ -241,6 +275,11 @@ let editingGroupId=null,editingModifierId=null;
 let profile={name:"",phone:""},registered=false;
 
 const $=id=>document.getElementById(id);
+
+function hideSplash(){
+const splash=$("splashScreen");
+if(splash)splash.classList.add("hide");
+}
 
 function showToast(message){
 const toast=$("toast");
@@ -1165,7 +1204,11 @@ showToast(error.message);
 // ЗАПУСК
 async function startApp(){
 renderCartButton();
+try{
 await Promise.all([loadMenu(),loadProfile()]);
+}finally{
+hideSplash();
+}
 }
 startApp();
 </script>
