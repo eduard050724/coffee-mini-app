@@ -978,10 +978,10 @@ const fd=new FormData(form);
 const data=Object.fromEntries(fd.entries());
 data.required=fd.has("required");
 
-// При создании привязки явно включаем её. Без enabled Worker воспринимал
-// запрос как команду отвязать группу, хотя интерфейс показывал успех.
+// Для новой привязки Worker должен получить enabled=true.
+// Без этого значения Worker воспринимает запрос как отвязку.
 if(action==="link.set"){
-    data.enabled=true;
+data.enabled=true;
 }
 
 ["price","price_delta","sort_order","min_select","max_select","volume_ml"].forEach(key=>{
